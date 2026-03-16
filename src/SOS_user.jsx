@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import './SOS_user.css';
+import popBallonImg from './assets/pop_ballon.jpg';
+
 
 const emergencyServices = [
   {
     id: 1,
-    icon: '🎈',
     title: 'Pop the ballon',
     color: '#FF6B6B',
     description: 'On te trouve l amour de ta vie... sauf si ça éclate avant ',
     number: '15',
+    image: popBallonImg,
   },
   {
     id: 2,
@@ -156,6 +158,7 @@ function SOS_user() {
         </button>
         <div className="detail-card" style={{ borderTop: `8px solid ${selectedService.color}` }}>
           <div className="detail-icon">{selectedService.icon}</div>
+          {selectedService.image && <img src={selectedService.image} className="detail-image" alt={selectedService.title} />}
           <h1>{selectedService.title}</h1>
           <p className="detail-description">{selectedService.description}</p>
           <div className="contact-section">
