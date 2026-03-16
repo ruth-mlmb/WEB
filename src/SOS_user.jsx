@@ -1,284 +1,258 @@
 import { useState } from 'react';
 import './SOS_user.css';
 
-const SOS_user = () => {
+const emergencyServices = [
+  {
+    id: 1,
+    icon: '🎈',
+    title: 'Pop the ballon',
+    color: '#FF6B6B',
+    description: 'On te trouve l amour de ta vie... sauf si ça éclate avant ',
+    number: '15',
+  },
+  {
+    id: 2,
+    icon: '🚒',
+    title: 'Pompiers',
+    color: '#FF4444',
+    description: "Intervention d'urgence",
+    number: '18',
+  },
+  {
+    id: 3,
+    icon: '🚓',
+    title: 'Police',
+    color: '#4169E1',
+    description: "Forces de l'ordre",
+    number: '17',
+  },
+  {
+    id: 4,
+    icon: '🚨',
+    title: 'Gendarmerie',
+    color: '#1E90FF',
+    description: 'Police nationale',
+    number: '17',
+  },
+  {
+    id: 5,
+    icon: '🦷',
+    title: 'Dentiste SOS',
+    color: '#9B59B6',
+    description: 'Urgences dentaires',
+    number: '112',
+  },
+  {
+    id: 6,
+    icon: '🐾',
+    title: 'Vétérinaire',
+    color: '#E74C3C',
+    description: 'Urgences animales',
+    number: '112',
+  },
+  {
+    id: 7,
+    icon: '🚗',
+    title: 'Assistance Auto',
+    color: '#F39C12',
+    description: 'Dépannage routier',
+    number: '112',
+  },
+  {
+    id: 8,
+    icon: '⚡',
+    title: 'Électricien',
+    color: '#F1C40F',
+    description: 'Urgences électriques',
+    number: '112',
+  },
+  {
+    id: 9,
+    icon: '⚖️',
+    title: 'Aide Juridique',
+    color: '#34495E',
+    description: "Conseil légal d'urgence",
+    number: '112',
+  },
+  {
+    id: 10,
+    icon: '🧠',
+    title: 'Soutien Mental',
+    color: '#16A085',
+    description: 'Écoute et soutien',
+    number: '3114',
+  },
+  {
+    id: 11,
+    icon: '💨',
+    title: "Gaz d'Urgence",
+    color: '#7F8C8D',
+    description: 'Fuite de gaz',
+    number: '0800555555',
+  },
+  {
+    id: 12,
+    icon: '👨‍🦽',
+    title: 'Aide à la Personne',
+    color: '#C0392B',
+    description: 'Assistance sociale',
+    number: '112',
+  },
+  {
+    id: 13,
+    icon: '☠️',
+    title: 'Anti-Poison',
+    color: '#2C3E50',
+    description: 'Centre toxicologique',
+    number: '0140054040',
+  },
+];
+
+const daysOfWeek = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+const times = ['Matin', 'Après-midi', 'Soir'];
+
+function SOS_user() {
   const [selectedService, setSelectedService] = useState(null);
   const [formData, setFormData] = useState({
-    name: '',
-    buildingNumber: '',
-    roomNumber: '',
-    timeSlot: 'Matin',
-    day: 'Lundi',
+    nomPote: '',
+    numeroBat: '',
+    numeroChambre: '',
+    horaire: '',
+    jour: daysOfWeek[0],
   });
-
-  const emergencyServices = [
-    {
-      id: 1,
-      icon: '🏥',
-      title: 'Urgences Médicales',
-      color: '#FF6B6B',
-      description: 'Pour toute urgence médicale ou blessure',
-      number: '15',
-    },
-    {
-      id: 2,
-      icon: '🚨',
-      title: 'Pompiers',
-      color: '#FFA500',
-      description: 'Incendie, accident, sauvetage',
-      number: '18',
-    },
-    {
-      id: 3,
-      icon: '👮',
-      title: 'Police',
-      color: '#4169E1',
-      description: 'Vol, agression, urgence sécurité',
-      number: '17',
-    },
-    {
-      id: 4,
-      icon: '☠️',
-      title: 'Intoxication',
-      color: '#9B59B6',
-      description: 'Empoisonnement, overdose, intoxication',
-      number: '112',
-    },
-    {
-      id: 5,
-      icon: '🧠',
-      title: 'Détresse Psychologique',
-      color: '#E74C3C',
-      description: 'Soutien psychologique et d\'écoute',
-      number: '3114',
-    },
-  ];
-
-  const handleServiceClick = (service) => {
-    setSelectedService(service);
-    // Reset form when changing service
-    setFormData({
-      name: '',
-      buildingNumber: '',
-      roomNumber: '',
-      timeSlot: 'Matin',
-      day: 'Lundi',
-    });
-  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleRadioChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      timeSlot: e.target.value,
-    }));
+  const handleTimeChange = (time) => {
+    setFormData((prev) => ({ ...prev, horaire: time }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // Verify all fields are filled
-    if (
-      !formData.name.trim() ||
-      !formData.buildingNumber.trim() ||
-      !formData.roomNumber.trim()
-    ) {
-      alert('❌ Veuillez remplir tous les champs du formulaire !');
+  const handleCommande = () => {
+    if (!formData.nomPote || !formData.numeroBat || !formData.numeroChambre || !formData.horaire) {
+      alert('Veuillez remplir tous les champs!');
       return;
     }
 
-    // Show success message with form data
-    const message = `
-📋 Commande SOS Confirmée !
-
-Service: ${selectedService.title}
-Numéro: ${selectedService.number}
-
-👤 Informations du copain:
-Nom: ${formData.name}
-Bâtiment: ${formData.buildingNumber}
-Chambre: ${formData.roomNumber}
-
-⏰ Horaire: ${formData.timeSlot}
-📅 Jour: ${formData.day}
-
-L'équipe de ${selectedService.title} a été alertée !
-    `;
-
-    alert(message);
-
-    // Reset form
+    alert(
+      `SOS commandé pour ${formData.nomPote} en Bat ${formData.numeroBat} Ch ${formData.numeroChambre}\n${formData.jour} - ${formData.horaire}`
+    );
     setFormData({
-      name: '',
-      buildingNumber: '',
-      roomNumber: '',
-      timeSlot: 'Matin',
-      day: 'Lundi',
+      nomPote: '',
+      numeroBat: '',
+      numeroChambre: '',
+      horaire: '',
+      jour: daysOfWeek[0],
     });
-  };
-
-  const handleBackClick = () => {
-    setSelectedService(null);
   };
 
   if (selectedService) {
     return (
       <div className="sos-detail-page">
-        <button className="back-btn" onClick={handleBackClick}>
+        <button className="back-btn" onClick={() => setSelectedService(null)}>
           ← Retour
         </button>
-
-        <div className="service-hero">
-          <div className="service-icon-large">{selectedService.icon}</div>
-          <h1 className="service-title">{selectedService.title}</h1>
-          <p className="service-description">{selectedService.description}</p>
-        </div>
-
-        <div className="emergency-number-box">
-          <span className="emergency-label">Numéro SOS:</span>
-          <span className="emergency-number">{selectedService.number}</span>
-        </div>
-
-        <form className="sos-form" onSubmit={handleSubmit}>
-          <h2 className="form-title">📞 Commande SOS pour un ami</h2>
-
-          <div className="form-group">
-            <label htmlFor="name">Nom du copain:</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              placeholder="Ex: Jean Dupont"
-              className="input-field"
-            />
+        <div className="detail-card" style={{ borderTop: `8px solid ${selectedService.color}` }}>
+          <div className="detail-icon">{selectedService.icon}</div>
+          <h1>{selectedService.title}</h1>
+          <p className="detail-description">{selectedService.description}</p>
+          <div className="contact-section">
+            <p className="contact-label">Numéro du SOS:</p>
+            <p className="contact-number">{selectedService.number}</p>
           </div>
-
-          <div className="form-row">
+          <div className="form-section">
             <div className="form-group">
-              <label htmlFor="buildingNumber">Numéro de bâtiment:</label>
+              <label>Nom du pote:</label>
               <input
                 type="text"
-                id="buildingNumber"
-                name="buildingNumber"
-                value={formData.buildingNumber}
+                name="nomPote"
+                placeholder="Écris le nom..."
+                value={formData.nomPote}
                 onChange={handleInputChange}
-                placeholder="Ex: A"
-                className="input-field"
               />
             </div>
-
             <div className="form-group">
-              <label htmlFor="roomNumber">Numéro de chambre:</label>
+              <label>Numéro de bat:</label>
               <input
                 type="text"
-                id="roomNumber"
-                name="roomNumber"
-                value={formData.roomNumber}
+                name="numeroBat"
+                placeholder="Écris le numéro..."
+                value={formData.numeroBat}
                 onChange={handleInputChange}
-                placeholder="Ex: 304"
-                className="input-field"
               />
             </div>
-          </div>
-
-          <div className="form-group">
-            <label>Horaire:</label>
-            <div className="radio-group">
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="timeSlot"
-                  value="Matin"
-                  checked={formData.timeSlot === 'Matin'}
-                  onChange={handleRadioChange}
-                />
-                🌅 Matin
-              </label>
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="timeSlot"
-                  value="Après-midi"
-                  checked={formData.timeSlot === 'Après-midi'}
-                  onChange={handleRadioChange}
-                />
-                ☀️ Après-midi
-              </label>
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="timeSlot"
-                  value="Soir"
-                  checked={formData.timeSlot === 'Soir'}
-                  onChange={handleRadioChange}
-                />
-                🌙 Soir
-              </label>
+            <div className="form-group">
+              <label>Numéro de chambre:</label>
+              <input
+                type="text"
+                name="numeroChambre"
+                placeholder="Écris le numéro..."
+                value={formData.numeroChambre}
+                onChange={handleInputChange}
+              />
             </div>
+            <div className="form-group">
+              <label>Horaire:</label>
+              <div className="radio-group">
+                {times.map((time) => (
+                  <label key={time} className="radio-label">
+                    <input
+                      type="radio"
+                      name="horaire"
+                      value={time}
+                      checked={formData.horaire === time}
+                      onChange={() => handleTimeChange(time)}
+                    />
+                    <span className="radio-text">{time}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div className="form-group">
+              <label>Jour:</label>
+              <select name="jour" value={formData.jour} onChange={handleInputChange}>
+                {daysOfWeek.map((day) => (
+                  <option key={day} value={day}>
+                    {day}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button className="command-btn" style={{ backgroundColor: selectedService.color }} onClick={handleCommande}>
+              ☎️ Commande le SOS
+            </button>
           </div>
-
-          <div className="form-group">
-            <label htmlFor="day">Jour:</label>
-            <select
-              id="day"
-              name="day"
-              value={formData.day}
-              onChange={handleInputChange}
-              className="select-field"
-            >
-              <option value="Lundi">Lundi</option>
-              <option value="Mardi">Mardi</option>
-              <option value="Mercredi">Mercredi</option>
-              <option value="Jeudi">Jeudi</option>
-              <option value="Vendredi">Vendredi</option>
-              <option value="Samedi">Samedi</option>
-              <option value="Dimanche">Dimanche</option>
-            </select>
-          </div>
-
-          <button type="submit" className="submit-btn">
-            ☎️ Commande le SOS
-          </button>
-        </form>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="sos-container">
-      <h1 className="sos-title">🆘 SOS INSAMERICA 🆘</h1>
-      <p className="sos-subtitle">
-        Trouve l'aide dont tu as besoin en cas d'urgence
-      </p>
-
-      <div className="services-grid">
+      <div className="sos-header">
+        <h1 className="sos-title">🆘 SOS INSAMERICA 🆘</h1>
+        <p className="sos-subtitle">Clique sur un SOS pour + d'infos!</p>
+      </div>
+      <div className="sos-bars">
         {emergencyServices.map((service) => (
           <div
             key={service.id}
-            className="service-bar"
+            className="sos-bar"
             style={{ backgroundColor: service.color }}
-            onClick={() => handleServiceClick(service)}
+            onClick={() => setSelectedService(service)}
           >
-            <span className="service-icon">{service.icon}</span>
-            <div className="service-info">
-              <h3 className="service-name">{service.title}</h3>
-              <p className="service-quick-desc">{service.number}</p>
+            <div className="bar-content">
+              <span className="bar-icon">{service.icon}</span>
+              <span className="bar-title">{service.title}</span>
+              <span className="bar-dots">•••</span>
             </div>
-            <span className="arrow">→</span>
           </div>
         ))}
       </div>
     </div>
   );
-};
+}
 
 export default SOS_user;
