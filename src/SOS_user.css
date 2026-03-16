@@ -1,0 +1,321 @@
+/* Global styles for SOS_user component */
+.sos-container {
+  padding: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.sos-title {
+  text-align: center;
+  font-size: 3rem;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 0.5rem;
+  animation: pulse 2s infinite;
+}
+
+.sos-subtitle {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #e0e0e0;
+  margin-bottom: 3rem;
+}
+
+.services-grid {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.service-bar {
+  display: flex;
+  align-items: center;
+  padding: 1.2rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  color: white;
+}
+
+.service-bar:hover {
+  transform: translateX(10px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.service-icon {
+  font-size: 2.5rem;
+  margin-right: 1.2rem;
+  flex-shrink: 0;
+}
+
+.service-info {
+  flex-grow: 1;
+}
+
+.service-name {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.service-quick-desc {
+  margin: 0.3rem 0 0 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.arrow {
+  font-size: 1.5rem;
+  opacity: 0.7;
+}
+
+/* Detail page styles */
+.sos-detail-page {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.back-btn {
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #667eea;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  background-color: white;
+  transform: translateX(-5px);
+}
+
+.service-hero {
+  max-width: 600px;
+  margin: 0 auto 2rem;
+  text-align: center;
+  color: white;
+}
+
+.service-icon-large {
+  font-size: 5rem;
+  margin-bottom: 1rem;
+  animation: bounce 2s infinite;
+}
+
+.service-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 1rem 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.service-description {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  margin-bottom: 2rem;
+}
+
+.emergency-number-box {
+  max-width: 600px;
+  margin: 0 auto 2rem;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 1.5rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.emergency-label {
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
+}
+
+.emergency-number {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #ff0000;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Form styles */
+.sos-form {
+  max-width: 600px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.form-title {
+  text-align: center;
+  color: #333;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.input-field,
+.select-field {
+  width: 100%;
+  padding: 0.8rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.input-field:focus,
+.select-field:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 600px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.radio-group {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+  color: #333;
+}
+
+.radio-label input[type='radio'] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  accent-color: #667eea;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+/* Animations */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+  .sos-container {
+    padding: 1.5rem;
+  }
+
+  .sos-title {
+    font-size: 2rem;
+  }
+
+  .sos-subtitle {
+    font-size: 1rem;
+  }
+
+  .service-bar {
+    padding: 1rem;
+  }
+
+  .service-icon {
+    font-size: 2rem;
+    margin-right: 1rem;
+  }
+
+  .service-name {
+    font-size: 1.1rem;
+  }
+
+  .service-title {
+    font-size: 2rem;
+  }
+
+  .service-icon-large {
+    font-size: 3.5rem;
+  }
+
+  .sos-form {
+    padding: 1.5rem;
+  }
+
+  .radio-group {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+}
