@@ -49,19 +49,13 @@ const sosSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['En attente', 'En cours', 'Résolu'],
-      default: 'En attente',
-      description: 'Statut de la commande SOS',
+      enum: ['en attente', 'confirmée', 'annulée'],
+      default: 'en attente',
+      description: 'Statut de la commande',
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
-
-// Index pour les recherches rapides par jour et horaire
-sosSchema.index({ jour: 1, horaire: 1 });
-sosSchema.index({ dateCommande: -1 });
 
 const SOS = mongoose.model('SOS', sosSchema);
 
