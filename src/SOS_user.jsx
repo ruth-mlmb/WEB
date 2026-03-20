@@ -2,6 +2,14 @@ import { useState } from 'react';
 import './SOS_user.css';
 import popBallonImg from './assets/pop_ballon.jpg';
 
+// Catégories de listes
+const listCategories = [
+  { id: 1, name: 'Food', icon: '🍔' },
+  { id: 2, name: 'Santé', icon: '⚕️' },
+  { id: 3, name: 'Sécurité', icon: '🔒' },
+  { id: 4, name: 'Transport', icon: '🚗' },
+  { id: 5, name: 'Urgence', icon: '🚨' },
+];
 
 const emergencyServices = [
   {
@@ -114,7 +122,9 @@ const daysOfWeek = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi',
 const times = ['Matin', 'Après-midi', 'Soir'];
 
 function SOS_user() {
+  const [selectedList, setSelectedList] = useState(null);
   const [selectedService, setSelectedService] = useState(null);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [formData, setFormData] = useState({
     nomPote: '',
     numeroBat: '',
@@ -150,15 +160,193 @@ function SOS_user() {
     });
   };
 
-  if (selectedService) {
+  // ===== PAGE 1: Grille de catégories =====
+  if (selectedList === null && selectedService === null) {
     return (
-      <div className="sos-detail-page">
-        <button className="back-btn" onClick={() => setSelectedService(null)}>
+      <div className="sos-main-container">
+        {/* Header avec navigation */}
+        <div className="sos-header-nav">
+          {/* Barre de navigation */}
+          <div className="navbar">
+            {/* Recherche à gauche */}
+            <div className="search-container">
+              <span className="search-icon">🔍</span>
+              <input type="text" className="search-input" placeholder="" />
+            </div>
+
+            {/* Titre au centre */}
+            <h1 className="navbar-title">TROUVES UNE LISTE</h1>
+
+            {/* Profil à droite */}
+            <div className="profile-container">
+              <button
+                className="profile-btn"
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
+              >
+                👤
+              </button>
+
+              {/* Menu déroulant profil */}
+              {showProfileMenu && (
+                <div className="profile-menu">
+                  <div className="menu-arrow"></div>
+                  <div className="menu-item">Nom complet</div>
+                  <hr />
+                  <div className="menu-item"># SOS disponibles: 13</div>
+                  <hr />
+                  <div className="menu-item">Mes SOS</div>
+                  <hr />
+                  <div className="menu-item logout">Déconnexion</div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Grille de catégories */}
+        <div className="lists-grid">
+          {listCategories.map((category, index) => (
+            <div
+              key={category.id}
+              className={`category-card ${index % 2 === 0 ? 'gray' : 'pink'}`}
+              onClick={() => setSelectedList(category.id)}
+            >
+              <div className="card-icon-large">{category.icon}</div>
+              <div className="card-title">{category.name}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // ===== PAGE 2: Grille des services pour une catégorie =====
+  if (selectedList !== null && selectedService === null) {
+    return (
+      <div className="sos-main-container">
+        {/* Header avec navigation */}
+        <div className="sos-header-nav">
+          {/* Barre de navigation */}
+          <div className="navbar">
+            {/* Recherche à gauche */}
+            <div className="search-container">
+              <span className="search-icon">🔍</span>
+              <input type="text" className="search-input" placeholder="" />
+            </div>
+
+            {/* Titre au centre */}
+            <h1 className="navbar-title">TROUVES TON SOS</h1>
+
+            {/* Profil à droite */}
+            <div className="profile-container">
+              <button
+                className="profile-btn"
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
+              >
+                👤
+              </button>
+
+              {/* Menu déroulant profil */}
+              {showProfileMenu && (
+                <div className="profile-menu">
+                  <div className="menu-arrow"></div>
+                  <div className="menu-item">Nom complet</div>
+                  <hr />
+                  <div className="menu-item"># SOS disponibles: 13</div>
+                  <hr />
+                  <div className="menu-item">Mes SOS</div>
+                  <hr />
+                  <div className="menu-item logout">Déconnexion</div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Bouton retour */}
+        <button className="back-btn-top" onClick={() => setSelectedList(null)}>
           ← Retour
         </button>
+
+        {/* Grille des services */}
+        <div className="services-grid">
+          {emergencyServices.map((service, index) => (
+            <div
+              key={service.id}
+              className={`service-card ${index % 2 === 0 ? 'gray' : 'pink'}`}
+              onClick={() => setSelectedService(service)}
+            >
+              {service.image ? (
+                <img src={service.image} className="card-image" alt={service.title} />
+              ) : (
+                <div className="card-icon">{service.icon}</div>
+              )}
+              <div className="card-name">{service.title}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // ===== PAGE 3: Détail du service et formulaire =====
+  if (selectedService) {
+    return (
+      <div className="sos-main-container">
+        {/* Header avec navigation */}
+        <div className="sos-header-nav">
+          {/* Barre de navigation */}
+          <div className="navbar">
+            {/* Recherche à gauche */}
+            <div className="search-container">
+              <span className="search-icon">🔍</span>
+              <input type="text" className="search-input" placeholder="" />
+            </div>
+
+            {/* Titre au centre */}
+            <h1 className="navbar-title">TROUVES TON SOS</h1>
+
+            {/* Profil à droite */}
+            <div className="profile-container">
+              <button
+                className="profile-btn"
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
+              >
+                👤
+              </button>
+
+              {/* Menu déroulant profil */}
+              {showProfileMenu && (
+                <div className="profile-menu">
+                  <div className="menu-arrow"></div>
+                  <div className="menu-item">Nom complet</div>
+                  <hr />
+                  <div className="menu-item"># SOS disponibles: 13</div>
+                  <hr />
+                  <div className="menu-item">Mes SOS</div>
+                  <hr />
+                  <div className="menu-item logout">Déconnexion</div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Bouton retour */}
+        <button className="back-btn-top" onClick={() => setSelectedService(null)}>
+          ← Retour
+        </button>
+
+        {/* Détail du service */}
         <div className="detail-card" style={{ borderTop: `8px solid ${selectedService.color}` }}>
           <div className="detail-icon">{selectedService.icon}</div>
-          {selectedService.image && <img src={selectedService.image} className="detail-image" alt={selectedService.title} />}
+          {selectedService.image && (
+            <img
+              src={selectedService.image}
+              className="detail-image"
+              alt={selectedService.title}
+            />
+          )}
           <h1>{selectedService.title}</h1>
           <p className="detail-description">{selectedService.description}</p>
           <div className="contact-section">
@@ -223,7 +411,11 @@ function SOS_user() {
                 ))}
               </select>
             </div>
-            <button className="command-btn" style={{ backgroundColor: selectedService.color }} onClick={handleCommande}>
+            <button
+              className="command-btn"
+              style={{ backgroundColor: selectedService.color }}
+              onClick={handleCommande}
+            >
               ☎️ Commande le SOS
             </button>
           </div>
@@ -231,31 +423,6 @@ function SOS_user() {
       </div>
     );
   }
-
-  return (
-    <div className="sos-container">
-      <div className="sos-header">
-        <h1 className="sos-title">🆘 SOS INSAMERICA 🆘</h1>
-        <p className="sos-subtitle">Clique sur un SOS pour + d'infos!</p>
-      </div>
-      <div className="sos-bars">
-        {emergencyServices.map((service) => (
-          <div
-            key={service.id}
-            className="sos-bar"
-            style={{ backgroundColor: service.color }}
-            onClick={() => setSelectedService(service)}
-          >
-            <div className="bar-content">
-              <span className="bar-icon">{service.icon}</span>
-              <span className="bar-title">{service.title}</span>
-              <span className="bar-dots">•••</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
 }
 
 export default SOS_user;
