@@ -142,22 +142,56 @@ function SOS_user() {
     setFormData((prev) => ({ ...prev, horaire: time }));
   };
 
-  const handleCommande = () => {
+  const handleCommande = async () => {
     if (!formData.nomPote || !formData.numeroBat || !formData.numeroChambre || !formData.horaire) {
       alert('Veuillez remplir tous les champs!');
       return;
     }
 
-    alert(
-      `SOS commandé pour ${formData.nomPote} en Bat ${formData.numeroBat} Ch ${formData.numeroChambre}\n${formData.jour} - ${formData.horaire}`
-    );
-    setFormData({
-      nomPote: '',
-      numeroBat: '',
-      numeroChambre: '',
-      horaire: '',
-      jour: daysOfWeek[0],
-    });
+    try {
+      // Préparer les données pour l'API
+      const dataToSend = {
+        serviceId: selectedService.id,
+        serviceName: selectedService.title,
+        nomPote: formData.nomPote,
+        numeroBat: formData.numeroBat,
+        numeroChambre: formData.numeroChambre,
+        jour: formData.jour,
+        horaire: formData.horaire,
+      };
+
+      // Appel API au backend
+      const response = await fetch('http://localhost:5000/api/sos/commande', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSend),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erreur lors de la commande');
+      }
+
+      // Succès ! Afficher un message et revenir au menu
+      alert(`✅ SOS commandé avec succès!\n${formData.nomPote} - ${selectedService.title}`);
+      
+      // Réinitialiser le formulaire et revenir à la liste
+      setFormData({
+        nomPote: '',
+        numeroBat: '',
+        numeroChambre: '',
+        horaire: '',
+        jour: daysOfWeek[0],
+      });
+      setSelectedService(null);
+      setSelectedList(null);
+    } catch (error) {
+      console.error('❌ Erreur:', error);
+      alert(`❌ Erreur: ${error.message}`);
+    }
   };
 
   // ===== PAGE 1: Grille de catégories =====
