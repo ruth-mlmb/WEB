@@ -30,12 +30,14 @@ router.post('/commande', async (req, res) => {
 
     // Validation des données
     if (!serviceId || !nomPote || !numeroBat || !numeroChambre || !horaire || !jour) {
+      console.log('❌ Validation échouée: champs manquants');
       return res.status(400).json({ error: 'Tous les champs sont requis' });
     }
 
     // Trouver le nom du service
     const service = emergencyServices.find((s) => s.id === parseInt(serviceId));
     if (!service) {
+      console.log('❌ Service invalide:', serviceId);
       return res.status(400).json({ error: 'Service invalide' });
     }
 
@@ -50,15 +52,17 @@ router.post('/commande', async (req, res) => {
       jour,
     });
 
+    console.log('💾 Sauvegarde en base de données...');
     await newSOS.save();
 
+    console.log('✅ SOS sauvegardé avec ID:', newSOS._id);
     res.status(201).json({
       message: '✅ SOS commandé avec succès!',
       data: newSOS,
     });
   } catch (error) {
-    console.error('Erreur lors de la commande SOS:', error);
-    res.status(500).json({ error: 'Erreur serveur' });
+    console.error('❌ Erreur lors de la commande SOS:', error);
+    res.status(500).json({ error: 'Erreur serveur', details: error.message });
   }
 });
 
@@ -90,33 +94,7 @@ router.get('/par-jour-horaire', async (req, res) => {
   }
 });
 
-// ✅ GET - SOS groupés par jour et horaire (statistiques)
-router.get('/statistiques', async (req, res) => {
-  try {
-    const stats = await SOS.aggregate([
-      {
-        $group: {
-          _id: {
-            jour: '$jour',
-            horaire: '$horaire',
-          },
-          count: { $sum: 1 },
-          services: { $push: '$serviceName' },
-        },
-      },
-      {
-        $sort: { '_id.jour': 1, '_id.horaire': 1 },
-      },
-    ]);
-
-    res.json(stats);
-  } catch (error) {
-    console.error('Erreur:', error);
-    res.status(500).json({ error: 'Erreur serveur' });
-  }
-});
-
-// ✅ GET - Un SOS par ID
+// ✅ GET - Détails d'un SOS
 router.get('/:id', async (req, res) => {
   try {
     const sos = await SOS.findById(req.params.id);
@@ -130,30 +108,12 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// ✅ UPDATE - Modifier le statut d'un SOS
-router.patch('/:id/status', async (req, res) => {
+// ✅ PUT - Mettre à jour le statut
+router.put('/:id/status', async (req, res) => {
   try {
     const { status } = req.body;
-    const validStatuses = ['En attente', 'En cours', 'Résolu'];
-
-    if (!validStatuses.includes(status)) {
-      return res.status(400).json({ error: 'Statut invalide' });
-    }
-
-    const sos = await SOS.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    );
-
-    if (!sos) {
-      return res.status(404).json({ error: 'SOS non trouvé' });
-    }
-
-    res.json({
-      message: 'Statut mis à jour',
-      data: sos,
-    });
+    const sos = await SOS.findByIdAndUpdate(req.params.id, { status }, { new: true });
+    res.json(sos);
   } catch (error) {
     console.error('Erreur:', error);
     res.status(500).json({ error: 'Erreur serveur' });
@@ -167,7 +127,7 @@ router.delete('/:id', async (req, res) => {
     if (!sos) {
       return res.status(404).json({ error: 'SOS non trouvé' });
     }
-    res.json({ message: '✅ SOS supprimé' });
+    res.json({ message: 'SOS supprimé avec succès' });
   } catch (error) {
     console.error('Erreur:', error);
     res.status(500).json({ error: 'Erreur serveur' });
