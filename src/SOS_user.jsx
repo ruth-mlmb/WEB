@@ -1,14 +1,19 @@
 import { useState } from 'react';
 import './SOS_user.css';
 import popBallonImg from './assets/pop_ballon.jpg';
+import cdp1 from './assets/cdp1.jpeg';
+import cdp2 from './assets/cdp.2.jpeg';
+import cdp3 from './assets/cdp3.jpeg';
+import cdp4 from './assets/cdp4.jpeg';
+import cdp5 from './assets/cdp5.jpeg';
 
 // Catégories de listes
 const listCategories = [
-  { id: 1, name: 'Food', icon: '🍔' },
-  { id: 2, name: 'Santé', icon: '⚕️' },
-  { id: 3, name: 'Sécurité', icon: '🔒' },
-  { id: 4, name: 'Transport', icon: '🚗' },
-  { id: 5, name: 'Urgence', icon: '🚨' },
+  { id: 1, name: 'INSApocalypse', image: cdp1 },
+  { id: 2, name: 'INSAmerica', image: cdp2 },
+  { id: 3, name: 'INSAlorsLaZone', image: cdp3 },
+  { id: 4, name:'INSAladdin', image: cdp4 },
+  { id: 5, name: 'CDPunch', image: cdp5 },
 ];
 
 const emergencyServices = [
@@ -245,7 +250,7 @@ function SOS_user() {
               className={`category-card ${index % 2 === 0 ? 'gray' : 'pink'}`}
               onClick={() => setSelectedList(category.id)}
             >
-              <div className="card-icon-large">{category.icon}</div>
+              <img src={category.image} alt={category.name} className="card-image-large" />
               <div className="card-title">{category.name}</div>
             </div>
           ))}
