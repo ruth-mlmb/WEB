@@ -3,22 +3,82 @@ import SOS from '../models/SOS.js';
 
 const router = express.Router();
 
-// Donnée des services (même que dans le frontend)
-const emergencyServices = [
-  { id: 1, title: 'Pop the ballon' },
-  { id: 2, title: 'Pompiers' },
-  { id: 3, title: 'Police' },
-  { id: 4, title: 'Gendarmerie' },
-  { id: 5, title: 'Dentiste SOS' },
-  { id: 6, title: 'Vétérinaire' },
-  { id: 7, title: 'Assistance Auto' },
-  { id: 8, title: 'Électricien' },
-  { id: 9, title: 'Aide Juridique' },
-  { id: 10, title: 'Soutien Mental' },
-  { id: 11, title: "Gaz d'Urgence" },
-  { id: 12, title: 'Aide à la Personne' },
-  { id: 13, title: 'Anti-Poison' },
-];
+// Listes de SOS pour chaque catégorie (même qu'en frontend)
+const sosPerCategory = {
+  1: [ // INSApocalypse
+    { id: 1, title: 'Cirque Apocalyptique' },
+    { id: 2, title: 'Fusée de Secours' },
+    { id: 3, title: 'Bunker Sûr' },
+    { id: 4, title: 'Déminage Express' },
+    { id: 5, title: 'Pompiers Extrêmes' },
+    { id: 6, title: 'Refuge Glacé' },
+    { id: 7, title: 'Électricien Fou' },
+    { id: 8, title: 'Tempête Contrôle' },
+    { id: 9, title: 'Scientifique SOS' },
+    { id: 10, title: 'Robot Salvateur' },
+    { id: 11, title: 'Explosion Control' },
+    { id: 12, title: 'Réalisateur SOS' },
+  ],
+  2: [ // INSAmerica
+    { id: 1, title: 'Cowboy Rescue' },
+    { id: 2, title: 'Eagle Air Force' },
+    { id: 3, title: 'Super Bowl SOS' },
+    { id: 4, title: 'Statue Liberté' },
+    { id: 5, title: 'Fast Food Doctor' },
+    { id: 6, title: 'Pickup Truck' },
+    { id: 7, title: 'Rock Band SOS' },
+    { id: 8, title: 'Camping Shelter' },
+    { id: 9, title: 'BBQ Master' },
+    { id: 10, title: 'Parc Aventure' },
+    { id: 11, title: 'Money Maker' },
+  ],
+  3: [ // INSAlorsLaZone
+    { id: 1, title: 'Désert SOS' },
+    { id: 2, title: 'Caravane Express' },
+    { id: 3, title: 'Bateau Zone' },
+    { id: 4, title: 'Île Refuge' },
+    { id: 5, title: 'Lampe Torche SOS' },
+    { id: 6, title: 'Navigateur Zone' },
+    { id: 7, title: 'Tente Camping' },
+    { id: 8, title: 'Explorateur SOS' },
+    { id: 9, title: 'Signal Relay' },
+    { id: 10, title: 'Trek Randonnée' },
+    { id: 11, title: 'Escalade Rescue' },
+  ],
+  4: [ // INSAladdin
+    { id: 1, title: 'Génie Magique' },
+    { id: 2, title: 'Tapis Volant SOS' },
+    { id: 3, title: 'Sabre Protecteur' },
+    { id: 4, title: 'Palais d\'Urgence' },
+    { id: 5, title: 'Bijoux de Chance' },
+    { id: 6, title: 'Spectacle Magie' },
+    { id: 7, title: 'Rose Éternelle' },
+    { id: 8, title: 'Couronne Royale' },
+    { id: 9, title: 'Temple Caché' },
+    { id: 10, title: 'Nuit Mystique' },
+    { id: 11, title: 'Étincelles SOS' },
+  ],
+  5: [ // CDPunch
+    { id: 1, title: 'Punch Ultime' },
+    { id: 2, title: 'Maître Karaté' },
+    { id: 3, title: 'Musclé Super' },
+    { id: 4, title: 'Champion SOS' },
+    { id: 5, title: 'Football Action' },
+    { id: 6, title: 'Médaille Honneur' },
+    { id: 7, title: 'Boxeur Pro' },
+    { id: 8, title: 'Premier Podium' },
+    { id: 9, title: 'Basketteur SOS' },
+    { id: 10, title: 'Tir Précis' },
+    { id: 11, title: 'Cycliste Express' },
+  ],
+};
+
+// Fonction pour obtenir un service par catégorie et ID
+const getServiceByIdAndCategory = (categoryId, serviceId) => {
+  const services = sosPerCategory[categoryId];
+  if (!services) return null;
+  return services.find((s) => s.id === parseInt(serviceId));
+};
 
 // ✅ POST - Créer un nouveau SOS
 router.post('/commande', async (req, res) => {
@@ -35,9 +95,9 @@ router.post('/commande', async (req, res) => {
     }
 
     // Trouver le nom du service
-    const service = emergencyServices.find((s) => s.id === parseInt(serviceId));
+    const service = getServiceByIdAndCategory(parseInt(listeId), serviceId);
     if (!service) {
-      console.log('❌ Service invalide:', serviceId);
+      console.log('❌ Service invalide:', serviceId, 'pour la catégorie:', listeId);
       return res.status(400).json({ error: 'Service invalide' });
     }
 
