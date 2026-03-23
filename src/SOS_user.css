@@ -990,3 +990,250 @@ body {
     letter-spacing: 0.5px;
   }
 }
+/* ======== NOUVEAUX STYLES MES SOS ET R�CAP ======== */
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.mes-sos-nav-btn {
+  padding: 0.6rem 1rem;
+  border: 2px solid #333;
+  background: white;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.mes-sos-nav-btn:hover {
+  background: #333;
+  color: white;
+}
+
+.services-grid .service-card,
+.category-card,
+.my-sos-card {
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.18);
+}
+
+.service-image-wrapper,
+.my-sos-image-wrapper {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  margin-bottom: 0.7rem;
+}
+
+.service-circle-image,
+.my-sos-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.my-sos-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(250px, 1fr));
+  gap: 1rem;
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.my-sos-card {
+  background: #f7f7f7;
+  border-radius: 20px;
+  padding: 1rem;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border: 1px solid #ddd;
+}
+
+.my-sos-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+}
+
+.my-sos-content h3 {
+  margin-bottom: 0.35rem;
+}
+
+.sos-list-name {
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #666;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.my-sos-content p {
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.status-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  border-radius: 12px;
+  padding: 0.25rem 0.65rem;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.status-badge.confirmed { background-color: #28a745; }
+.status-badge.pending { background-color: #ffc107; color: #333; }
+
+.cancel-btn {
+  margin-top: 0.7rem;
+  width: 100%;
+  background-color: #e53935;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0.4rem 0.65rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+}
+
+.cancel-btn:hover {
+  background-color: #c62828;
+}
+
+.recap-card {
+  max-width: 850px;
+  margin: 2rem auto;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+  border: 1px solid #e1e1e1;
+}
+
+.recap-topbar {
+  height: 12px;
+  width: 100%;
+}
+
+.recap-image-container {
+  width: 100%;
+  height: 320px;
+  background: #f3f3f3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recap-image {
+  max-width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.empty-photo-big,
+.empty_photo {
+  font-size: 0.9rem;
+  color: #777;
+  text-align: center;
+}
+
+.image-upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+  border: 2px dashed #ccc;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.image-upload-placeholder:hover {
+  background: linear-gradient(135deg, #e8e8e8 0%, #d8d8d8 100%);
+  border-color: #999;
+}
+
+.upload-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.upload-text {
+  font-size: 0.8rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.recap-title {
+  text-align: center;
+  margin: 1.2rem 0 0.4rem;
+}
+
+.recap-state {
+  text-align: center;
+  color: #444;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.recap-info {
+  padding: 0 2rem 1.8rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.recap-info p {
+  margin: 0.35rem 0;
+}
+
+.confirm-btn {
+  display: block;
+  margin: 0 auto 1.5rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0.8rem 1.4rem;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.confirm-btn:hover { background-color: #218838; }
+
+.center-text {
+  text-align: center;
+  margin: 1.5rem 0;
+  color: #666;
+}
+
+.error-text {
+  color: #c0392b;
+}
+
+@media (max-width: 992px) {
+  .my-sos-grid { grid-template-columns: repeat(2, minmax(200px, 1fr)); }
+}
+
+@media (max-width: 768px) {
+  .lists-grid, .services-grid, .my-sos-grid { grid-template-columns: 1fr; }
+  .navbar { flex-wrap: wrap; row-gap: 0.8rem; }
+  .navbar-title { flex-basis: 100%; }
+  .service-image-wrapper, .my-sos-image-wrapper { margin: 0 auto 0.9rem; }
+}

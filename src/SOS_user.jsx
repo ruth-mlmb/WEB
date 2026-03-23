@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './SOS_user.css';
 import popBallonImg from './assets/pop_ballon.jpg';
+import waitImg from './assets/wait.jpg';
 import cdp1 from './assets/cdp1.jpeg';
 import cdp2 from './assets/cdp.2.jpeg';
 import cdp3 from './assets/cdp3.jpeg';
@@ -127,9 +128,15 @@ const daysOfWeek = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi',
 const times = ['Matin', 'Après-midi', 'Soir'];
 
 function SOS_user() {
+  const [activePage, setActivePage] = useState('categories');
   const [selectedList, setSelectedList] = useState(null);
   const [selectedService, setSelectedService] = useState(null);
+  const [selectedSOS, setSelectedSOS] = useState(null);
+  const [mySOS, setMySOS] = useState([]);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [availableSOS, setAvailableSOS] = useState(5); // Quota initial
   const [formData, setFormData] = useState({
     nomPote: '',
     numeroBat: '',
@@ -147,17 +154,80 @@ function SOS_user() {
     setFormData((prev) => ({ ...prev, horaire: time }));
   };
 
+  useEffect(() => {
+    const fetchMySOS = async () => {
+      setIsLoading(true);
+      setError('');
+      try {
+        const response = await fetch('http://localhost:5000/api/sos/tous');
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || 'Erreur serveur');
+        }
+        setMySOS(data);
+
+        // Calculer le nombre de SOS disponibles (quota de 13 par jour)
+        const today = new Date().toDateString();
+        const todaysSOS = data.filter(sos => {
+          const sosDate = new Date(sos.dateCommande).toDateString();
+          return sosDate === today;
+        });
+        const usedSOS = todaysSOS.length;
+        setAvailableSOS(13 - usedSOS);
+
+      } catch (err) {
+        console.error('Erreur fetchMySOS:', err);
+        setError('Impossible de charger vos SOS pour le moment.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMySOS();
+
+    const onGlobalClick = (event) => {
+      const target = event.target;
+      if (target && target.textContent === 'Mes SOS') {
+        setActivePage('mySOS');
+        setShowProfileMenu(false);
+      }
+    };
+
+    window.addEventListener('click', onGlobalClick);
+    return () => {
+      window.removeEventListener('click', onGlobalClick);
+    };
+  }, []);
+
   const handleCommande = async () => {
+    console.log('handleCommande called');
+    console.log('selectedList:', selectedList, typeof selectedList);
+    console.log('selectedService:', selectedService);
+
     if (!formData.nomPote || !formData.numeroBat || !formData.numeroChambre || !formData.horaire) {
       alert('Veuillez remplir tous les champs!');
       return;
     }
 
+    if (!selectedList) {
+      alert('Veuillez sélectionner une liste CDP d\'abord.');
+      return;
+    }
+
     try {
       // Préparer les données pour l'API
+      console.log('selectedList:', selectedList, 'type:', typeof selectedList);
+      console.log('listCategories ids:', listCategories.map(cat => ({id: cat.id, type: typeof cat.id})));
+      const selectedListData = listCategories.find(list => {
+        console.log('Comparing', list.id, '(', typeof list.id, ') with', selectedList, '(', typeof selectedList, ')');
+        return list.id == selectedList;
+      });
+      console.log('selectedListData:', selectedListData);
       const dataToSend = {
         serviceId: selectedService.id,
         serviceName: selectedService.title,
+        listeId: selectedList,
+        listeName: selectedListData?.name || 'Liste inconnue',
         nomPote: formData.nomPote,
         numeroBat: formData.numeroBat,
         numeroChambre: formData.numeroChambre,
@@ -182,7 +252,19 @@ function SOS_user() {
 
       // Succès ! Afficher un message et revenir au menu
       alert(`✅ SOS commandé avec succès!\n${formData.nomPote} - ${selectedService.title}`);
-      
+
+      // L'API renvoie { message, data: sos } ; on cible data
+      const sosSaved = data.data || data;
+
+      const newSOS = {
+        ...sosSaved,
+        status: sosSaved.status || 'en attente', // Garder pour compatibilité frontend
+        etat: sosSaved.etat ?? 0,
+        image: selectedService.image || null,
+      };
+      setMySOS((prev) => [newSOS, ...prev]);
+      setAvailableSOS((prev) => prev - 1); // Décrémenter le quota
+
       // Réinitialiser le formulaire et revenir à la liste
       setFormData({
         nomPote: '',
@@ -193,25 +275,168 @@ function SOS_user() {
       });
       setSelectedService(null);
       setSelectedList(null);
+      setActivePage('mySOS');
     } catch (error) {
       console.error('❌ Erreur:', error);
       alert(`❌ Erreur: ${error.message}`);
     }
   };
 
+  const canCancelSOS = (sos) => {
+    if (!sos) return false;
+    if (sos.etat === 1) return false; // Ne peut pas annuler si déjà confirmé
+    const createdAt = sos.dateCommande ? new Date(sos.dateCommande) : new Date(sos.createdAt);
+    const elapsedMin = (Date.now() - createdAt.getTime()) / (1000 * 60);
+    return elapsedMin <= 30;
+  };
+
+  const cancelSOS = async (sosId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/sos/${sosId}`, { method: 'DELETE' });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Erreur annulation SOS');
+      }
+      alert('✅ SOS annulé avec succès');
+      setMySOS((prev) => prev.filter((sos) => sos._id !== sosId && sos.id !== sosId));
+      setAvailableSOS((prev) => prev + 1); // Incrémenter le compteur de SOS disponibles
+    } catch (error) {
+      console.error('❌ Erreur annulation SOS:', error);
+      alert(`❌ ${error.message}`);
+    }
+  };
+
+  // ===== PAGE 0: Mes SOS =====
+  if (activePage === 'mySOS') {
+    return (
+      <div className="sos-main-container">
+        <div className="sos-header-nav">
+          <div className="navbar">
+            <div className="search-container">
+              <span className="search-icon">🔍</span>
+              <input type="text" className="search-input" placeholder="" />
+            </div>
+            <h1 className="navbar-title">MES SOS</h1>
+            <div className="profile-container">
+              <button className="profile-btn" onClick={() => setShowProfileMenu(!showProfileMenu)}>👤</button>
+              {showProfileMenu && (
+                <div className="profile-menu">
+                  <div className="menu-arrow"></div>
+                  <div className="menu-item">Nom complet</div>
+                  <hr />
+                  <div className="menu-item"># SOS disponibles: {availableSOS}</div>
+                  <hr />
+                  <div className="menu-item" onClick={() => { setActivePage('categories'); setShowProfileMenu(false); }}>Nouveau SOS</div>
+                  <hr />
+                  <div className="menu-item logout">Déconnexion</div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <button className="back-btn-top" onClick={() => setActivePage('categories')}>← Retour</button>
+
+        {isLoading && <p className="center-text">Chargement des SOS...</p>}
+        {error && <p className="center-text error-text">{error}</p>}
+
+        <div className="my-sos-grid">
+          {mySOS.length === 0 && !isLoading && <div className="center-text">Aucun SOS enregistré pour le moment.</div>}
+          {mySOS
+            .sort((a, b) => (a.listeName || '').localeCompare(b.listeName || ''))
+            .map((sos) => {
+            const isConfirmed = sos.etat === 1; // 1 = confirmée
+            const serviceData = emergencyServices.find(s => s.id === sos.serviceId);
+            const hasImage = serviceData?.image;
+            const imageSrc = isConfirmed && hasImage ? serviceData.image : (isConfirmed && !hasImage ? null : waitImg);
+            return (
+              <div key={sos._id || sos.id} className="my-sos-card" onClick={() => { setSelectedSOS(sos); setActivePage('recap'); }}>
+                <div className="my-sos-image-wrapper">
+                  {imageSrc ? (
+                    <img src={imageSrc} alt={sos.serviceName} className="my-sos-image" />
+                  ) : isConfirmed && !hasImage ? (
+                    <div className="image-upload-placeholder">
+                      <div className="upload-icon">📷</div>
+                      <div className="upload-text">Ajouter photo</div>
+                    </div>
+                  ) : (
+                    <div className="empty_photo">Aucune photo</div>
+                  )}
+                </div>
+                <div className="my-sos-content">
+                  <div className="sos-list-name">{sos.listeName || 'Liste inconnue'}</div>
+                  <h3>{sos.serviceName}</h3>
+                  <p>{sos.nomPote} ({sos.jour} {sos.horaire})</p>
+                </div>
+                <span className={`status-badge ${isConfirmed ? 'confirmed' : 'pending'}`}>{isConfirmed ? 'Validé' : 'En cours'}</span>
+                {canCancelSOS(sos) && (
+                  <button
+                    className="cancel-btn"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      if (window.confirm('Voulez-vous annuler ce SOS ?')) cancelSOS(sos._id || sos.id);
+                    }}
+                  >
+                    Annuler le sos
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  if (activePage === 'recap' && selectedSOS) {
+    const isConfirmed = selectedSOS.etat === 1; // 1 = confirmée
+    const imageSrc = isConfirmed ? (selectedSOS.image || '') : waitImg;
+    return (
+      <div className="sos-main-container">
+        <div className="sos-header-nav">
+          <div className="navbar">
+            <div className="search-container">
+              <span className="search-icon">🔍</span>
+              <input type="text" className="search-input" placeholder="" />
+            </div>
+            <h1 className="navbar-title">Récapitulatif</h1>
+            <div className="profile-container">
+              <button className="profile-btn" onClick={() => setShowProfileMenu(!showProfileMenu)}>👤</button>
+            </div>
+          </div>
+        </div>
+        <button className="back-btn-top" onClick={() => setActivePage('mySOS')}>← Retour</button>
+        <div className="recap-card">
+          <div className="recap-topbar" style={{ backgroundColor: isConfirmed ? '#28a745' : '#dc3545' }} />
+          <div className="recap-image-container">
+            {imageSrc ? <img src={imageSrc} alt="Photo du SOS" className="recap-image" /> : <div className="empty-photo-big">Aucune photo disponible</div>}
+          </div>
+          <h1 className="recap-title">{selectedSOS.serviceName}</h1>
+          <p className="recap-state">{isConfirmed ? 'Votre SOS a été validé avec succès!' : 'SOS en attente - intervention en cours'}</p>
+          <div className="recap-info">
+            <p>Nom du pote: {selectedSOS.nomPote}</p>
+            <p>Bâtiment: {selectedSOS.numeroBat}</p>
+            <p>Chambre: {selectedSOS.numeroChambre}</p>
+            <p>Jour: {selectedSOS.jour}</p>
+            <p>Horaire: {selectedSOS.horaire}</p>
+            <p>Statut: <strong>{isConfirmed ? 'Confirmée' : 'En cours'}</strong></p>
+          </div>
+          {!isConfirmed && <p className="waiting-text">En attente de traitement...</p>}
+        </div>
+      </div>
+    );
+  }
+
   // ===== PAGE 1: Grille de catégories =====
-  if (selectedList === null && selectedService === null) {
+  if (activePage === 'categories') {
     return (
       <div className="sos-main-container">
         {/* Header avec navigation */}
         <div className="sos-header-nav">
           {/* Barre de navigation */}
           <div className="navbar">
-            {/* Recherche à gauche */}
-            <div className="search-container">
-              <span className="search-icon">🔍</span>
-              <input type="text" className="search-input" placeholder="" />
-            </div>
+            {/* Espace vide à gauche pour centrer le titre */}
+            <div className="navbar-spacer"></div>
 
             {/* Titre au centre */}
             <h1 className="navbar-title">TROUVES UNE LISTE</h1>
@@ -231,9 +456,9 @@ function SOS_user() {
                   <div className="menu-arrow"></div>
                   <div className="menu-item">Nom complet</div>
                   <hr />
-                  <div className="menu-item"># SOS disponibles: 13</div>
+                  <div className="menu-item"># SOS disponibles: {availableSOS}</div>
                   <hr />
-                  <div className="menu-item">Mes SOS</div>
+                  <div className="menu-item" onClick={() => { setActivePage('mySOS'); setShowProfileMenu(false); }}>Mes SOS</div>
                   <hr />
                   <div className="menu-item logout">Déconnexion</div>
                 </div>
@@ -248,7 +473,7 @@ function SOS_user() {
             <div
               key={category.id}
               className={`category-card ${index % 2 === 0 ? 'gray' : 'pink'}`}
-              onClick={() => setSelectedList(category.id)}
+              onClick={() => { setSelectedList(category.id); setActivePage('services'); }}
             >
               <img src={category.image} alt={category.name} className="card-image-large" />
               <div className="card-title">{category.name}</div>
@@ -260,7 +485,7 @@ function SOS_user() {
   }
 
   // ===== PAGE 2: Grille des services pour une catégorie =====
-  if (selectedList !== null && selectedService === null) {
+  if (activePage === 'services') {
     return (
       <div className="sos-main-container">
         {/* Header avec navigation */}
@@ -291,9 +516,9 @@ function SOS_user() {
                   <div className="menu-arrow"></div>
                   <div className="menu-item">Nom complet</div>
                   <hr />
-                  <div className="menu-item"># SOS disponibles: 13</div>
+                  <div className="menu-item"># SOS disponibles: {availableSOS}</div>
                   <hr />
-                  <div className="menu-item">Mes SOS</div>
+                  <div className="menu-item" onClick={() => { setActivePage('mySOS'); setShowProfileMenu(false); }}>Mes SOS</div>
                   <hr />
                   <div className="menu-item logout">Déconnexion</div>
                 </div>
@@ -303,7 +528,7 @@ function SOS_user() {
         </div>
 
         {/* Bouton retour */}
-        <button className="back-btn-top" onClick={() => setSelectedList(null)}>
+        <button className="back-btn-top" onClick={() => { setSelectedList(null); setActivePage('categories'); }}>
           ← Retour
         </button>
 
@@ -313,7 +538,7 @@ function SOS_user() {
             <div
               key={service.id}
               className={`service-card ${index % 2 === 0 ? 'gray' : 'pink'}`}
-              onClick={() => setSelectedService(service)}
+              onClick={() => { setSelectedService(service); setActivePage('detail'); }}
             >
               {service.image ? (
                 <img src={service.image} className="card-image" alt={service.title} />
@@ -329,18 +554,15 @@ function SOS_user() {
   }
 
   // ===== PAGE 3: Détail du service et formulaire =====
-  if (selectedService) {
+  if (activePage === 'detail' && selectedService) {
     return (
       <div className="sos-main-container">
         {/* Header avec navigation */}
         <div className="sos-header-nav">
           {/* Barre de navigation */}
           <div className="navbar">
-            {/* Recherche à gauche */}
-            <div className="search-container">
-              <span className="search-icon">🔍</span>
-              <input type="text" className="search-input" placeholder="" />
-            </div>
+            {/* Espace vide à gauche pour centrer le titre */}
+            <div className="navbar-spacer"></div>
 
             {/* Titre au centre */}
             <h1 className="navbar-title">TROUVES TON SOS</h1>
@@ -360,9 +582,9 @@ function SOS_user() {
                   <div className="menu-arrow"></div>
                   <div className="menu-item">Nom complet</div>
                   <hr />
-                  <div className="menu-item"># SOS disponibles: 13</div>
+                  <div className="menu-item"># SOS disponibles: {availableSOS}</div>
                   <hr />
-                  <div className="menu-item">Mes SOS</div>
+                  <div className="menu-item" onClick={() => { setActivePage('mySOS'); setShowProfileMenu(false); }}>Mes SOS</div>
                   <hr />
                   <div className="menu-item logout">Déconnexion</div>
                 </div>
@@ -372,7 +594,7 @@ function SOS_user() {
         </div>
 
         {/* Bouton retour */}
-        <button className="back-btn-top" onClick={() => setSelectedService(null)}>
+        <button className="back-btn-top" onClick={() => { setSelectedService(null); setActivePage('services'); }}>
           ← Retour
         </button>
 

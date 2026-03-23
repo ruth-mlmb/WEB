@@ -12,6 +12,16 @@ const sosSchema = new mongoose.Schema(
       required: true,
       description: 'Nom du service (ex: Pompiers, Police)',
     },
+    listeId: {
+      type: Number,
+      required: true,
+      description: 'ID de la liste CDP (1-5)',
+    },
+    listeName: {
+      type: String,
+      required: true,
+      description: 'Nom de la liste CDP (ex: INSApocalypse, INSAmerica)',
+    },
     nomPote: {
       type: String,
       required: true,
@@ -47,11 +57,11 @@ const sosSchema = new mongoose.Schema(
       default: Date.now,
       description: 'Timestamp exact de la commande',
     },
-    status: {
-      type: String,
-      enum: ['en attente', 'confirmée', 'annulée'],
-      default: 'en attente',
-      description: 'Statut de la commande',
+    etat: {
+      type: Number,
+      enum: [0, 1], // 0 = en cours, 1 = confirmée
+      default: 0,
+      description: 'État numérique : 0=en cours, 1=confirmée',
     },
   },
   { timestamps: true }

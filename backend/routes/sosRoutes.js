@@ -23,13 +23,13 @@ const emergencyServices = [
 // ✅ POST - Créer un nouveau SOS
 router.post('/commande', async (req, res) => {
   try {
-    const { serviceId, nomPote, numeroBat, numeroChambre, horaire, jour } = req.body;
+    const { serviceId, listeId, listeName, nomPote, numeroBat, numeroChambre, horaire, jour } = req.body;
 
     // LOG: Voir ce qui est reçu
-    console.log('📨 Données reçues:', { serviceId, nomPote, numeroBat, numeroChambre, horaire, jour });
+    console.log('📨 Données reçues:', { serviceId, listeId, listeName, nomPote, numeroBat, numeroChambre, horaire, jour });
 
     // Validation des données
-    if (!serviceId || !nomPote || !numeroBat || !numeroChambre || !horaire || !jour) {
+    if (!serviceId || !listeId || !listeName || !nomPote || !numeroBat || !numeroChambre || !horaire || !jour) {
       console.log('❌ Validation échouée: champs manquants');
       return res.status(400).json({ error: 'Tous les champs sont requis' });
     }
@@ -45,6 +45,8 @@ router.post('/commande', async (req, res) => {
     const newSOS = new SOS({
       serviceId,
       serviceName: service.title,
+      listeId: parseInt(listeId),
+      listeName,
       nomPote,
       numeroBat,
       numeroChambre,
@@ -120,17 +122,33 @@ router.put('/:id/status', async (req, res) => {
   }
 });
 
-// ✅ DELETE - Supprimer un SOS
+// ✅ DELETE - Annuler (supprimer) un SOS
 router.delete('/:id', async (req, res) => {
   try {
-    const sos = await SOS.findByIdAndDelete(req.params.id);
+    const sos = await SOS.findById(req.params.id);
     if (!sos) {
       return res.status(404).json({ error: 'SOS non trouvé' });
     }
-    res.json({ message: 'SOS supprimé avec succès' });
+
+    if (sos.etat === 1) {
+      return res.status(400).json({ error: 'Ce SOS est déjà confirmé et ne peut pas être annulé.' });
+    }
+
+    const now = new Date();
+    const dateCommande = new Date(sos.dateCommande);
+    const diffMinutes = (now - dateCommande) / (1000 * 60);
+
+    if (diffMinutes > 30) {
+      return res.status(400).json({ error: 'Délai d\'annulation dépassé (30 minutes).' });
+    }
+
+    // Suppression définitive
+    await SOS.findByIdAndDelete(req.params.id);
+
+    res.json({ message: 'SOS annulé avec succès.' });
   } catch (error) {
     console.error('Erreur:', error);
-    res.status(500).json({ error: 'Erreur serveur' });
+    res.status(500).json({ error: 'Erreur serveur', details: error.message });
   }
 });
 
