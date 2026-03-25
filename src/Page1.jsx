@@ -1,5 +1,9 @@
 import styled from 'styled-components';
 import { createGlobalStyle } from "styled-components";
+import PageTest from './PageTest.jsx';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const GlobalStyle = createGlobalStyle`
   *, *::before, *::after {
@@ -34,7 +38,7 @@ const StyleTitre = styled.h1`
   text-shadow: 3px 3px 8px rgba(0,0,0,0.25);
 
   display: inline-block;
-  transform: perspective(300px) rotateX(-35deg);
+  transform: perspective(200px) rotateX(-15deg);
 `;
 
 const StyleScore = styled.button`
@@ -74,12 +78,10 @@ const StyleValid = styled.button`
 `;
 
 function Valid() {
-  const clicked = () => {
-    alert("Clicked!");
-  }
+  const navigate = useNavigate();
 
   return (
-    <p onClick={clicked}>Valider le SOS</p>
+    <p onClick={() => navigate("/test")}>Valider le SOS</p>
   );
 }
 
@@ -97,11 +99,11 @@ function SOS () {
     );
 }
 
-function Score () {
+function Score (props) {
     return (
         <>
-          <h1>Score</h1>
-          <p>Classement actuel</p>
+          <h1>{props.score}</h1>
+          <p>{props.classement}ème sur 8 listes</p>
         </>
     );
 }
@@ -115,8 +117,9 @@ function PageCDP () {
                     <p>MES SOS</p>
                 </StyleTitre>
                 <StyleScore>
-                    <Score />
+                    <Score score='240' classement='4'/>
                 </StyleScore>
+                
                 <>
                 <SOS1>
                     <SOS />
@@ -166,4 +169,17 @@ function PageCDP () {
     );
 }
 
-export default PageCDP;
+const App = () => {
+  return (
+    <>
+      <Router>
+        <Routes>
+          <Route path="/" element={<PageCDP />} />
+          <Route path="/test" element={<PageTest />} />
+        </Routes>
+      </Router>
+    </>
+  );
+};
+
+export default App;
