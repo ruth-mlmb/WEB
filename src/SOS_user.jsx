@@ -113,7 +113,7 @@ function SOS_user() {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [availableSOS, setAvailableSOS] = useState(5); // Quota initial
+  const [availableSOS, setAvailableSOS] = useState(6); // Quota initial
   const [formData, setFormData] = useState({
     nomPote: '',
     numeroBat: '',
