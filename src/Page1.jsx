@@ -1,94 +1,167 @@
 import styled from 'styled-components';
+import { createGlobalStyle } from "styled-components";
 
-const MyStyle = styled.h3`
-  padding: 1% 0%;
-  background-color: #d84800;
-  color: white;
-  border-radius: 25px;
-  text-align: center;
-  font-size: 100%;
-  margin: 0% 35% 0%;
-`;
+const GlobalStyle = createGlobalStyle`
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
 
-const StyleSOSs = styled.h3`
-  padding: 1% 0%;
-  background-color: #d84800;
-  color: white;
-  border-radius: 25px;
-  text-align: center;
-  font-size: 100%;
-  margin: 1% 2% 0%;
-`;
-
-const StyleSOS = styled.h3`
-  padding: 0.5% 0%;
-  background-color: #e4d1c7;
-  color: black;
-  border-radius: 25px;
-  text-align: center;
-  font-size: 100%;
-  width: 45%;
-  margin: 1% 2% 0%;
-  position: relative;
-  z-index: 2;
-`;
-
-const StyleSpeSOS = styled.h3`
-  padding: 0.5% 0%;
-  background-color: #f1e8e3;
-  color: black;
-  border-radius: 25px;
-  text-align: left;
-  font-size: 100%;
-  width: 90%;
-  margin: -1.5% 4% 0%;
-  border: 7px solid #f1e8e3;
-  position: relative;
-  z-index: 1;
+  html, body, #root {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    width: 100%;
+    overflow-x: hidden;
   }
 `;
 
-function SOS (props) {
-    return (
-        <>
-        <StyleSOS>
-            <h3>SOS {props.num}</h3>
-        </StyleSOS>
-        <StyleSpeSOS>
-            <h4>Heure du SOS</h4>
-            <h4>Destinataire du SOS</h4>
-            <h4>Turne cible</h4>
-        </StyleSpeSOS>
-        </>
-    );
+const StylePage = styled.div`
+  background-color: #fff8f8;
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+`;
+
+const StyleTitre = styled.h1`
+  font-size: 400%;
+  font-weight: 900;
+  letter-spacing: 5%;
+  text-align: center;
+  color: #333;
+  margin: 4% 0% 3%;
+
+  text-shadow: 3px 3px 8px rgba(0,0,0,0.25);
+
+  display: inline-block;
+  transform: perspective(300px) rotateX(-35deg);
+`;
+
+const StyleScore = styled.button`
+  padding: 0.5% 10%;
+  background-color: #d9d9d9;
+  color: black;
+  border-radius: 25px;
+  text-align: center;
+  font-size: 100%;
+  margin: 1% 35% 2%;
+`;
+
+const StyleSOS = styled.button`
+  padding: 1% 3%;
+  color: black;
+  border-radius: 25px;
+  text-align: center;
+  font-size: 90%;
+  margin: 1% 2% 0%;
+`;
+
+const SOS1 = styled(StyleSOS)`
+  background-color: #d9d9d9;
+`
+
+const SOS2 = styled(StyleSOS)`
+  background-color: #ffd374;
+`
+const StyleValid = styled.button`
+  padding: 5% 14%;
+  color: black;
+  border-radius: 25px;
+  text-align: center;
+  font-size: 90%;
+  margin: 4% 2% 0%;
+  background-color: #ffffff;
+`;
+
+function Valid() {
+  const clicked = () => {
+    alert("Clicked!");
+  }
+
+  return (
+    <p onClick={clicked}>Valider le SOS</p>
+  );
 }
 
-function MenuSOS () {
+function SOS () {
     return (
         <>
-        <h2>SOS reçus</h2>
-        <SOS num = "1" />
-        <SOS num = "2" />
-        <SOS num = "3" />
+            <h3>SOS</h3>
+            <p>Heure du SOS</p>
+            <p>Destinataire du SOS</p>
+            <p>Turne cible</p>
+            <StyleValid>
+                <Valid />
+            </StyleValid>
         </>
     );
 }
 
 function Score () {
     return (
-        <h1>Score</h1>
+        <>
+          <h1>Score</h1>
+          <p>Classement actuel</p>
+        </>
     );
 }
 
 function PageCDP () {
     return (
         <>
-        <MyStyle>
-            <Score />
-        </MyStyle>
-        <StyleSOSs>
-            <MenuSOS />
-        </StyleSOSs>
+            <GlobalStyle />
+            <StylePage>
+                <StyleTitre>
+                    <p>MES SOS</p>
+                </StyleTitre>
+                <StyleScore>
+                    <Score />
+                </StyleScore>
+                <>
+                <SOS1>
+                    <SOS />
+                </SOS1>
+                <SOS2>
+                    <SOS />
+                </SOS2>
+                <SOS1>
+                    <SOS />
+                </SOS1>
+                <SOS2>
+                    <SOS />
+                </SOS2>
+                <SOS1>
+                    <SOS />
+                </SOS1>
+                <SOS2>
+                    <SOS />
+                </SOS2>
+                <SOS1>
+                    <SOS />
+                </SOS1>
+                <SOS2>
+                    <SOS />
+                </SOS2>
+                <SOS1>
+                    <SOS />
+                </SOS1>
+                <SOS2>
+                    <SOS />
+                </SOS2>
+                <SOS1>
+                    <SOS />
+                </SOS1>
+                <SOS2>
+                    <SOS />
+                </SOS2>
+                <SOS1>
+                    <SOS />
+                </SOS1>
+                <SOS2>
+                    <SOS />
+                </SOS2>
+                </>
+            </StylePage>
         </>
     );
 }
