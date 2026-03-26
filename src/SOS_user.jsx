@@ -151,7 +151,7 @@ function SOS_user() {
           return sosDate === today;
         });
         const usedSOS = todaysSOS.length;
-        setAvailableSOS(13 - usedSOS);
+        setAvailableSOS(6 - usedSOS);
 
       } catch (err) {
         console.error('Erreur fetchMySOS:', err);
