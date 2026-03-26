@@ -1,6 +1,6 @@
-import express from "express";
-import { MongoClient } from "mongodb";
-import cors from "cors";
+const express    = require("express");
+const { MongoClient } = require("mongodb");
+const cors       = require("cors");
 
 const app = express();
 app.use(cors());
@@ -8,7 +8,8 @@ app.use(express.json());
 
 // ── 👇 CHANGE CES DEUX VALEURS ────────────────────────────────
 const MONGO_URI     = "mongodb+srv://cpoudensan:WEB@cluster0.vqv51nv.mongodb.net/?appName=Cluster0";
-const DATABASE_NAME = "liste";
+const DATABASE_NAME = "SOS";          // nom exact de ta DB
+const COLLECTION    = "SOS_Commandes"; // nom exact de ta collection
 // ─────────────────────────────────────────────────────────────
 
 let db;
@@ -20,27 +21,49 @@ MongoClient.connect(MONGO_URI)
   })
   .catch((err) => console.error("❌ Erreur MongoDB :", err));
 
+
+// ── GET /api/candidates ───────────────────────────────────────
+// Regroupe les SOS_Commandes par listeNAME
+// et compte ceux dont etat === 1 (terminé)
 app.get("/api/candidates", async (req, res) => {
   try {
-    const collections = await db.listCollections().toArray();
+    const results = await db
+      .collection(COLLECTION)
+      .aggregate([
+        {
+          // Regroupe par listeNAME, compte uniquement etat = 1
+          $group: {
+            _id: "$listeNAME",
+            score: {
+              $sum: {
+                $cond: [{ $eq: ["$etat", 1] }, 1, 0]
+              }
+            }
+          }
+        },
+        {
+          // Trie par score décroissant
+          $sort: { score: -1 }
+        },
+        {
+          // Renomme _id en name pour le front
+          $project: {
+            _id: 0,
+            id:    "$_id",
+            name:  "$_id",
+            score: 1
+          }
+        }
+      ])
+      .toArray();
 
-    const results = await Promise.all(
-      collections.map(async (col) => {
-        const name  = col.name;
-        const score = await db
-          .collection(name)
-          .countDocuments({ status: "terminé" });
-        return { id: name, name, score };
-      })
-    );
-
-    results.sort((a, b) => b.score - a.score);
     res.json(results);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erreur serveur" });
   }
 });
+
 
 const PORT = 3000;
 app.listen(PORT, () =>
