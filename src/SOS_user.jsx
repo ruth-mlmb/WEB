@@ -196,22 +196,17 @@ function SOS_user() {
       // Préparer les données pour l'API
       console.log('selectedList:', selectedList, 'type:', typeof selectedList);
       console.log('listCategories ids:', listCategories.map(cat => ({id: cat.id, type: typeof cat.id})));
-      const selectedListData = listCategories.find(list => {
-        console.log('Comparing', list.id, '(', typeof list.id, ') with', selectedList, '(', typeof selectedList, ')');
-        return list.id == selectedList;
-      });
-      console.log('selectedListData:', selectedListData);
       const dataToSend = {
         serviceId: selectedService.id,
-        serviceName: selectedService.title,
         listeId: selectedList,
-        listeName: selectedListData?.name || 'Liste inconnue',
         nomPote: formData.nomPote,
         numeroBat: formData.numeroBat,
         numeroChambre: formData.numeroChambre,
         jour: formData.jour,
         horaire: formData.horaire,
       };
+
+      console.log('📨 Données à envoyer:', dataToSend);
 
       // Appel API au backend
       const response = await fetch('http://localhost:5000/api/sos/commande', {
@@ -321,18 +316,18 @@ function SOS_user() {
         <div className="my-sos-grid">
           {mySOS.length === 0 && !isLoading && <div className="center-text">Aucun SOS enregistré pour le moment.</div>}
           {mySOS
-            .sort((a, b) => (a.listeName || '').localeCompare(b.listeName || ''))
+            .sort((a, b) => (a.listeId?.name || '').localeCompare(b.listeId?.name || ''))
             .map((sos) => {
             const isConfirmed = sos.etat === 1; // 1 = confirmée
-            const serviceData = getServiceById(sos.serviceId);
-            const hasImage = serviceData?.image;
-            const imageSrc = isConfirmed && hasImage ? serviceData.image : (isConfirmed && !hasImage ? null : waitImg);
+            const serviceTitle = sos.sosId?.title || 'Service inconnu';
+            const serviceImage = sos.sosId?.image;
+            const imageSrc = isConfirmed && serviceImage ? serviceImage : (isConfirmed && !serviceImage ? null : waitImg);
             return (
               <div key={sos._id || sos.id} className="my-sos-card" onClick={() => { setSelectedSOS(sos); setActivePage('recap'); }}>
                 <div className="my-sos-image-wrapper">
                   {imageSrc ? (
-                    <img src={imageSrc} alt={sos.serviceName} className="my-sos-image" />
-                  ) : isConfirmed && !hasImage ? (
+                    <img src={imageSrc} alt={serviceTitle} className="my-sos-image" />
+                  ) : isConfirmed && !serviceImage ? (
                     <div className="image-upload-placeholder">
                       <div className="upload-icon">📷</div>
                       <div className="upload-text">Ajouter photo</div>
@@ -342,8 +337,8 @@ function SOS_user() {
                   )}
                 </div>
                 <div className="my-sos-content">
-                  <div className="sos-list-name">{sos.listeName || 'Liste inconnue'}</div>
-                  <h3>{sos.serviceName}</h3>
+                  <div className="sos-list-name">{sos.listeId?.name || 'Liste inconnue'}</div>
+                  <h3>{serviceTitle}</h3>
                   <p>{sos.nomPote} ({sos.jour} {sos.horaire})</p>
                 </div>
                 <span className={`status-badge ${isConfirmed ? 'confirmed' : 'pending'}`}>{isConfirmed ? 'Validé' : 'En cours'}</span>
@@ -389,7 +384,7 @@ function SOS_user() {
           <div className="recap-image-container">
             {imageSrc ? <img src={imageSrc} alt="Photo du SOS" className="recap-image" /> : <div className="empty-photo-big">Aucune photo disponible</div>}
           </div>
-          <h1 className="recap-title">{selectedSOS.serviceName}</h1>
+          <h1 className="recap-title">{selectedSOS.sosId?.title || 'Service inconnu'}</h1>
           <p className="recap-state">{isConfirmed ? 'Votre SOS a été validé avec succès!' : 'SOS en attente - intervention en cours'}</p>
           <div className="recap-info">
             <p>Nom du pote: {selectedSOS.nomPote}</p>
