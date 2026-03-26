@@ -67,6 +67,6 @@ const sosSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const SOS = mongoose.model('SOS', sosSchema);
+const SOS = mongoose.model('SOS', sosSchema, 'SOS_commandes');
 
 export default SOS;
