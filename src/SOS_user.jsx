@@ -650,22 +650,27 @@ function SOS_user() {
             </div>
             <div className="form-group">
               <label>Numéro de bat:</label>
-              <input
-                type="text"
+              <select
                 name="numeroBat"
-                placeholder="Écris le numéro..."
                 value={formData.numeroBat}
                 onChange={handleInputChange}
-              />
+              >
+                <option value="">Choisis un bâtiment...</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+              </select>
             </div>
             <div className="form-group">
               <label>Numéro de chambre:</label>
               <input
-                type="text"
+                type="number"
                 name="numeroChambre"
                 placeholder="Écris le numéro..."
                 value={formData.numeroChambre}
                 onChange={handleInputChange}
+                min="1"
               />
             </div>
             <div className="form-group">
