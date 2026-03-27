@@ -27,6 +27,7 @@ export default function Topbar({ title }) {
           <div className="dropdown" onClick={() => setOpen(false)}>
             <div className="dropdown-item" onClick={() => navigate("/valides")}>SOS validés</div>
             <div className="dropdown-item" onClick={() => navigate("/expires")}>SOS expirés</div>
+            <div className="dropdown-item" onClick={() => navigate("/ajout")}>Nouveau SOS</div>
             <div className="dropdown-item danger">Déconnexion</div>
           </div>
         )}
