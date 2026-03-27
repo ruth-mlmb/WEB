@@ -106,6 +106,9 @@ const times = ['Matin', 'Après-midi', 'Soir'];
 
 function SOS_user() {
   const [activePage, setActivePage] = useState('categories');
+  const [currentUser, setCurrentUser] = useState(
+    localStorage.getItem('userId') || 'utilisateur'
+  );
   const [selectedList, setSelectedList] = useState(null);
   const [selectedService, setSelectedService] = useState(null);
   const [selectedSOS, setSelectedSOS] = useState(null);
@@ -189,7 +192,8 @@ function SOS_user() {
       setIsLoading(true);
       setError('');
       try {
-        const response = await fetch('http://localhost:5000/api/sos/tous');
+        const userId = localStorage.getItem('userId') || currentUser;
+        const response = await fetch(`http://localhost:5000/api/sos/tous?userId=${encodeURIComponent(userId)}`);
         const data = await response.json();
         if (!response.ok) {
           throw new Error(data.error || 'Erreur serveur');
@@ -250,7 +254,9 @@ function SOS_user() {
       console.log('selectedList:', selectedList, 'type:', typeof selectedList);
       console.log('listCategories ids:', listCategoriesState.map(cat => ({id: cat.id, type: typeof cat.id})));
       const listeName = selectedList.name || selectedList.Nom || '';
+      const userId = localStorage.getItem('userId') || currentUser;
       const dataToSend = {
+        userId,
         serviceId: selectedService.id,
         listeName: listeName,
         nomPote: formData.nomPote,
@@ -349,7 +355,7 @@ function SOS_user() {
               {showProfileMenu && (
                 <div className="profile-menu">
                   <div className="menu-arrow"></div>
-                  <div className="menu-item">Nom complet</div>
+                  <div className="menu-item">{currentUser}</div>
                   <hr />
                   <div className="menu-item"># SOS disponibles: {availableSOS}</div>
                   <hr />
@@ -481,7 +487,7 @@ function SOS_user() {
               {showProfileMenu && (
                 <div className="profile-menu">
                   <div className="menu-arrow"></div>
-                  <div className="menu-item">Nom complet</div>
+                  <div className="menu-item">{currentUser}</div>
                   <hr />
                   <div className="menu-item"># SOS disponibles: {availableSOS}</div>
                   <hr />
@@ -586,7 +592,7 @@ function SOS_user() {
               {showProfileMenu && (
                 <div className="profile-menu">
                   <div className="menu-arrow"></div>
-                  <div className="menu-item">Nom complet</div>
+                  <div className="menu-item">{currentUser}</div>
                   <hr />
                   <div className="menu-item"># SOS disponibles: {availableSOS}</div>
                   <hr />
@@ -656,7 +662,7 @@ function SOS_user() {
               {showProfileMenu && (
                 <div className="profile-menu">
                   <div className="menu-arrow"></div>
-                  <div className="menu-item">Nom complet</div>
+                  <div className="menu-item">{currentUser}</div>
                   <hr />
                   <div className="menu-item"># SOS disponibles: {availableSOS}</div>
                   <hr />

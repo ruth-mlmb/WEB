@@ -38,13 +38,13 @@ router.get('/services', async (req, res) => {
 // ✅ POST - Créer un nouveau SOS commandé
 router.post('/commande', async (req, res) => {
   try {
-    const { serviceId, listeName, nomPote, numeroBat, numeroChambre, horaire, jour } = req.body;
+    const { userId, serviceId, listeName, nomPote, numeroBat, numeroChambre, horaire, jour } = req.body;
 
     // LOG: Voir ce qui est reçu
-    console.log('📨 Données reçues:', { serviceId, listeName, nomPote, numeroBat, numeroChambre, horaire, jour });
+    console.log('📨 Données reçues:', { userId, serviceId, listeName, nomPote, numeroBat, numeroChambre, horaire, jour });
 
     // Validation des données
-    if (!serviceId || !listeName || !nomPote || !numeroBat || !numeroChambre || !horaire || !jour) {
+    if (!userId || !serviceId || !listeName || !nomPote || !numeroBat || !numeroChambre || !horaire || !jour) {
       console.log('❌ Validation échouée: champs manquants');
       return res.status(400).json({ error: 'Tous les champs sont requis' });
     }
@@ -73,6 +73,7 @@ router.post('/commande', async (req, res) => {
 
     // Créer la nouvelle commande de SOS
     const newSOSCommande = new SOSCommande({
+      userId,
       nomPote,
       numeroBat,
       numeroChambre: parseInt(numeroChambre),
@@ -99,10 +100,15 @@ router.post('/commande', async (req, res) => {
   }
 });
 
-// ✅ GET - Récupérer tous les SOS commandés
+// ✅ GET - Récupérer tous les SOS commandés (ou filtrés par userId)
 router.get('/tous', async (req, res) => {
   try {
-    const tous = await SOSCommande.find()
+    const { userId } = req.query;
+    
+    // Si userId est fourni, filtrer par utilisateur
+    const query = userId ? { userId } : {};
+    
+    const tous = await SOSCommande.find(query)
       .populate('listeId')
       .populate('sosId')
       .sort({ dateCommande: -1 });

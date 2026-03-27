@@ -2,6 +2,11 @@ import mongoose from 'mongoose';
 
 const sosCommandeSchema = new mongoose.Schema(
   {
+    userId: {
+      type: String,
+      required: true,
+      description: '_id de l\'utilisateur INSA',
+    },
     nomPote: {
       type: String,
       required: true,
