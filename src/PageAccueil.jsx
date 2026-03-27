@@ -265,6 +265,7 @@ export default function PageAccueil() {
               <Dropdown onClick={() => setOpen(false)}>
                 <DropItem onClick={() => navigate("/valides")}>SOS validés</DropItem>
                 <DropItem onClick={() => navigate("/expires")}>SOS expirés</DropItem>
+                <DropItem onClick={() => navigate("/ajout")}>Nouveau SOS</DropItem>
                 <DropItem $danger>Déconnexion</DropItem>
               </Dropdown>
             )}
