@@ -106,9 +106,6 @@ const times = ['Matin', 'Après-midi', 'Soir'];
 
 function SOS_user() {
   const [activePage, setActivePage] = useState('categories');
-  const [currentUser, setCurrentUser] = useState(
-    localStorage.getItem('userId') || 'utilisateur'
-  );
   const [selectedList, setSelectedList] = useState(null);
   const [selectedService, setSelectedService] = useState(null);
   const [selectedSOS, setSelectedSOS] = useState(null);
@@ -116,7 +113,7 @@ function SOS_user() {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [availableSOS, setAvailableSOS] = useState(6); // Quota initial
+  const [availableSOS, setAvailableSOS] = useState(7); // Quota initial
   const [formData, setFormData] = useState({
     nomPote: '',
     numeroBat: '',
@@ -158,31 +155,17 @@ function SOS_user() {
   const fetchServicesByListe = async (liste) => {
     if (!liste) return;
     try {
-      const listeName = liste.name || liste.Nom || '';
-      console.log('🔄 Fetch SOS pour liste:', listeName);
-      const response = await fetch(`http://localhost:5000/api/sos/services?listeName=${encodeURIComponent(listeName)}`);
+      const queryId = liste.id || liste._id || liste;
+      const response = await fetch(`http://localhost:5000/api/sos/services?listeId=${queryId}`);
       if (!response.ok) throw new Error('Impossible de charger les services');
       const data = await response.json();
-      console.log('✅ Services reçus:', data);
       if (Array.isArray(data) && data.length > 0) {
-        // Mapper les données pour compatibilité avec le frontend
-        const mappedServices = data.map((sos) => ({
-          id: sos.serviceId,
-          title: sos.name,
-          description: sos.Description,
-          image: sos.image,
-          liste: sos.liste,
-          icon: '🆘', // Icône par défaut
-          color: '#FF6B6B', // Couleur par défaut
-          number: '112', // Numéro par défaut
-        }));
-        setServices(mappedServices);
+        setServices(data);
       } else {
-        console.log('⚠️ Aucun service en DB, utilisation fallback');
         setServices(getServicesForCategory(liste.id));
       }
     } catch (err) {
-      console.warn('❌ Erreur fetchServicesByListe, utilisation fallback :', err);
+      console.warn('Erreur fetchServicesByListe, utilisation fallback :', err);
       setServices(getServicesForCategory(liste.id));
     }
   };
@@ -192,8 +175,7 @@ function SOS_user() {
       setIsLoading(true);
       setError('');
       try {
-        const userId = localStorage.getItem('userId') || currentUser;
-        const response = await fetch(`http://localhost:5000/api/sos/tous?userId=${encodeURIComponent(userId)}`);
+        const response = await fetch('http://localhost:5000/api/sos/tous');
         const data = await response.json();
         if (!response.ok) {
           throw new Error(data.error || 'Erreur serveur');
@@ -253,12 +235,9 @@ function SOS_user() {
       // Préparer les données pour l'API
       console.log('selectedList:', selectedList, 'type:', typeof selectedList);
       console.log('listCategories ids:', listCategoriesState.map(cat => ({id: cat.id, type: typeof cat.id})));
-      const listeName = selectedList.name || selectedList.Nom || '';
-      const userId = localStorage.getItem('userId') || currentUser;
       const dataToSend = {
-        userId,
         serviceId: selectedService.id,
-        listeName: listeName,
+        listeId: selectedList.id || selectedList,
         nomPote: formData.nomPote,
         numeroBat: formData.numeroBat,
         numeroChambre: formData.numeroChambre,
@@ -345,17 +324,17 @@ function SOS_user() {
       <div className="sos-main-container">
         <div className="sos-header-nav">
           <div className="navbar">
-            <div className="search-container">
+            {/* <div className="search-container">
               <span className="search-icon">🔍</span>
               <input type="text" className="search-input" placeholder="" />
-            </div>
+            </div> */}
             <h1 className="navbar-title">MES SOS</h1>
             <div className="profile-container">
               <button className="profile-btn" onClick={() => setShowProfileMenu(!showProfileMenu)}>👤</button>
               {showProfileMenu && (
                 <div className="profile-menu">
                   <div className="menu-arrow"></div>
-                  <div className="menu-item">{currentUser}</div>
+                  <div className="menu-item">Nom complet</div>
                   <hr />
                   <div className="menu-item"># SOS disponibles: {availableSOS}</div>
                   <hr />
@@ -379,7 +358,7 @@ function SOS_user() {
             .sort((a, b) => (a.listeId?.name || '').localeCompare(b.listeId?.name || ''))
             .map((sos) => {
             const isConfirmed = sos.etat === 1; // 1 = confirmée
-            const serviceTitle = sos.sosId?.name || 'Service inconnu';
+            const serviceTitle = sos.sosId?.title || 'Service inconnu';
             const serviceImage = sos.sosId?.image;
             const imageSrc = isConfirmed && serviceImage ? serviceImage : (isConfirmed && !serviceImage ? null : waitImg);
             return (
@@ -397,7 +376,7 @@ function SOS_user() {
                   )}
                 </div>
                 <div className="my-sos-content">
-                  <div className="sos-list-name">{sos.listeId?.Nom || sos.listeId?.name || 'Liste inconnue'}</div>
+                  <div className="sos-list-name">{sos.listeId?.name || 'Liste inconnue'}</div>
                   <h3>{serviceTitle}</h3>
                   <p>{sos.nomPote} ({sos.jour} {sos.horaire})</p>
                 </div>
@@ -444,7 +423,7 @@ function SOS_user() {
           <div className="recap-image-container">
             {imageSrc ? <img src={imageSrc} alt="Photo du SOS" className="recap-image" /> : <div className="empty-photo-big">Aucune photo disponible</div>}
           </div>
-          <h1 className="recap-title">{selectedSOS.sosId?.name || 'Service inconnu'}</h1>
+          <h1 className="recap-title">{selectedSOS.sosId?.title || 'Service inconnu'}</h1>
           <p className="recap-state">{isConfirmed ? 'Votre SOS a été validé avec succès!' : 'SOS en attente - intervention en cours'}</p>
           <div className="recap-info">
             <p>Nom du pote: {selectedSOS.nomPote}</p>
@@ -487,7 +466,7 @@ function SOS_user() {
               {showProfileMenu && (
                 <div className="profile-menu">
                   <div className="menu-arrow"></div>
-                  <div className="menu-item">{currentUser}</div>
+                  <div className="menu-item">Nom complet</div>
                   <hr />
                   <div className="menu-item"># SOS disponibles: {availableSOS}</div>
                   <hr />
@@ -592,7 +571,7 @@ function SOS_user() {
               {showProfileMenu && (
                 <div className="profile-menu">
                   <div className="menu-arrow"></div>
-                  <div className="menu-item">{currentUser}</div>
+                  <div className="menu-item">Nom complet</div>
                   <hr />
                   <div className="menu-item"># SOS disponibles: {availableSOS}</div>
                   <hr />
@@ -662,7 +641,7 @@ function SOS_user() {
               {showProfileMenu && (
                 <div className="profile-menu">
                   <div className="menu-arrow"></div>
-                  <div className="menu-item">{currentUser}</div>
+                  <div className="menu-item">Nom complet</div>
                   <hr />
                   <div className="menu-item"># SOS disponibles: {availableSOS}</div>
                   <hr />
