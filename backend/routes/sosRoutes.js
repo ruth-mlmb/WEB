@@ -5,6 +5,45 @@ import Listes from '../models/Listes.js';
 
 const router = express.Router();
 
+// ✅ GET - Récupérer toutes les listes depuis la base de données
+router.get('/listes', async (req, res) => {
+  try {
+    const listes = await Listes.find().sort({ id: 1 });
+    res.json(listes);
+  } catch (error) {
+    console.error('Erreur récupération listes:', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// ✅ GET - Récupérer tous les services pour une liste (query listeId numérique ou ObjectId)
+router.get('/services', async (req, res) => {
+  const { listeId } = req.query;
+  if (!listeId) {
+    return res.status(400).json({ error: 'listeId requis' });
+  }
+
+  try {
+    let liste = null;
+    if (/^[0-9]+$/.test(listeId)) {
+      liste = await Listes.findOne({ id: parseInt(listeId, 10) });
+    }
+    if (!liste) {
+      liste = await Listes.findById(listeId);
+    }
+
+    if (!liste) {
+      return res.status(404).json({ error: 'Liste introuvable' });
+    }
+
+    const services = await SOS.find({ listeId: liste._id }).sort({ id: 1 });
+    res.json(services);
+  } catch (error) {
+    console.error('Erreur récupération services:', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
 // ✅ POST - Créer un nouveau SOS commandé
 router.post('/commande', async (req, res) => {
   try {

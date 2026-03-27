@@ -122,6 +122,8 @@ function SOS_user() {
     jour: daysOfWeek[0],
   });
   const [searchTerm, setSearchTerm] = useState('');
+  const [listCategoriesState, setListCategoriesState] = useState(listCategories);
+  const [services, setServices] = useState([]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -130,6 +132,42 @@ function SOS_user() {
 
   const handleTimeChange = (time) => {
     setFormData((prev) => ({ ...prev, horaire: time }));
+  };
+
+  const fetchListes = async () => {
+    try {
+      console.log('🔄 Tentative de fetch des listes depuis DB...');
+      const response = await fetch('http://localhost:5000/api/sos/listes');
+      if (!response.ok) throw new Error('Impossible de charger les listes');
+      const data = await response.json();
+      console.log('✅ Listes reçues de DB:', data);
+      if (Array.isArray(data) && data.length > 0) {
+        setListCategoriesState(data);
+        console.log('📝 listCategoriesState mis à jour avec DB');
+      } else {
+        console.log('⚠️ Aucune liste en DB, utilisation fallback');
+      }
+    } catch (err) {
+      console.warn('❌ Erreur fetchListes, utilisation fallback :', err);
+    }
+  };
+
+  const fetchServicesByListe = async (liste) => {
+    if (!liste) return;
+    try {
+      const queryId = liste.id || liste._id || liste;
+      const response = await fetch(`http://localhost:5000/api/sos/services?listeId=${queryId}`);
+      if (!response.ok) throw new Error('Impossible de charger les services');
+      const data = await response.json();
+      if (Array.isArray(data) && data.length > 0) {
+        setServices(data);
+      } else {
+        setServices(getServicesForCategory(liste.id));
+      }
+    } catch (err) {
+      console.warn('Erreur fetchServicesByListe, utilisation fallback :', err);
+      setServices(getServicesForCategory(liste.id));
+    }
   };
 
   useEffect(() => {
@@ -162,6 +200,7 @@ function SOS_user() {
     };
 
     fetchMySOS();
+    fetchListes();
 
     const onGlobalClick = (event) => {
       const target = event.target;
@@ -195,10 +234,10 @@ function SOS_user() {
     try {
       // Préparer les données pour l'API
       console.log('selectedList:', selectedList, 'type:', typeof selectedList);
-      console.log('listCategories ids:', listCategories.map(cat => ({id: cat.id, type: typeof cat.id})));
+      console.log('listCategories ids:', listCategoriesState.map(cat => ({id: cat.id, type: typeof cat.id})));
       const dataToSend = {
         serviceId: selectedService.id,
-        listeId: selectedList,
+        listeId: selectedList.id || selectedList,
         nomPote: formData.nomPote,
         numeroBat: formData.numeroBat,
         numeroChambre: formData.numeroChambre,
@@ -442,14 +481,18 @@ function SOS_user() {
 
         {/* Grille de catégories */}
         <div className="lists-grid">
-          {listCategories.map((category, index) => (
+          {listCategoriesState.map((category, index) => (
             <div
-              key={category.id}
+              key={category.id || category._id}
               className={`category-card ${index % 2 === 0 ? 'gray' : 'pink'}`}
-              onClick={() => { setSelectedList(category.id); setActivePage('services'); }}
+              onClick={() => {
+                setSelectedList(category);
+                setActivePage('services');
+                fetchServicesByListe(category);
+              }}
             >
-              <img src={category.image} alt={category.name} className="card-image-large" />
-              <div className="card-title">{category.name}</div>
+              <img src={category.image} alt={category.Nom || category.name} className="card-image-large" />
+              <div className="card-title">{category.Nom || category.name}</div>
             </div>
           ))}
         </div>
@@ -482,7 +525,7 @@ function SOS_user() {
     };
     
     // Obtenir les services de la catégorie et filtrer/trier
-    const allServices = getServicesForCategory(selectedList);
+    const allServices = services.length > 0 ? services : getServicesForCategory(selectedList?.id || selectedList);
     const filteredServices = searchLower 
       ? allServices
           .map(service => ({ ...service, score: calculateScore(service) }))

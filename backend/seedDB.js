@@ -8,11 +8,11 @@ dotenv.config();
 
 // Données des listes
 const listesData = [
-  { id: 1, name: 'INSApocalypse' },
-  { id: 2, name: 'INSAmerica' },
-  { id: 3, name: 'INSAlorsLaZone' },
-  { id: 4, name: 'INSAladdin' },
-  { id: 5, name: 'CDPunch' },
+  { id: 1, name: 'INSApocalypse', image: '/assets/cdp1.jpeg' },
+  { id: 2, name: 'INSAmerica', image: '/assets/cdp2.jpeg' },
+  { id: 3, name: 'INSAlorsLaZone', image: '/assets/cdp3.jpeg' },
+  { id: 4, name: 'INSAladdin', image: '/assets/cdp4.jpeg' },
+  { id: 5, name: 'CDPunch', image: '/assets/cdp5.jpeg' },
 ];
 
 // Données des SOS par liste
