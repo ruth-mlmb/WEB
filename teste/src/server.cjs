@@ -6,11 +6,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ── 👇 CHANGE CES DEUX VALEURS ────────────────────────────────
+
 const MONGO_URI     = "mongodb+srv://cpoudensan:WEB@cluster0.vqv51nv.mongodb.net/?appName=Cluster0";
 const DATABASE_NAME = "SOS";          // nom exact de ta DB
 const COLLECTION    = "SOS_Commandes"; // nom exact de ta collection
-// ─────────────────────────────────────────────────────────────
+
 
 let db;
 
