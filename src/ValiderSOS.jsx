@@ -3,15 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Topbar from "./Topbar";
 import "./index.css";
 
-const MOCK_SOS = [
-  { id: 1, nom: "Limbo Challenge",  heure: "18h00", destinataire: "Alex Blanc",  turne: "T-099" },
-  { id: 2, nom: "Selfie Fontaine",  heure: "12h00", destinataire: "Nina Moreau", turne: "T-143" },
-  { id: 3, nom: "Battle Dance",     heure: "20h00", destinataire: "Romain F.",   turne: "T-211" },
-  { id: 4, nom: "Pub Crawl Photo",  heure: "21h30", destinataire: "Chloé A.",    turne: "T-077" },
-  { id: 5, nom: "Vélo Tour",        heure: "10h30", destinataire: "Yann Gérard", turne: "T-255" },
-  { id: 6, nom: "Karaoké Express",  heure: "22h00", destinataire: "Léa Martin",  turne: "T-302" },
-  { id: 7, nom: "Yoga Surprise",    heure: "09h00", destinataire: "Tom Duval",   turne: "T-188" },
-];
+import { validerSos } from "./api.js";
 
 export default function ValiderSOS() {
   const { id } = useParams();
@@ -31,10 +23,17 @@ export default function ValiderSOS() {
     setPreview(URL.createObjectURL(file));
   };
 
-  const handleSubmit = () => {
-    if (!cdpNom.trim() || !photo) return;
-    setSubmitted(true);
-    setTimeout(() => navigate("/valides"), 2000);
+  const handleSubmit = async () => {
+    if (!cdpNom.trim() || !photo || !sos) return;
+    try {
+      setSubmitted(true);
+      await validerSos(sos.key || sos.id, cdpNom, photo);
+      setTimeout(() => navigate("/valides"), 2000);
+    } catch (error) {
+      console.error("Erreur lors de la validation:", error);
+      setSubmitted(false);
+      alert("Erreur lors de la validation du SOS");
+    }
   };
 
   return (

@@ -1,6 +1,7 @@
 import styled, { createGlobalStyle, keyframes } from "styled-components";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { fetchSosEnAttente, fetchScore } from "./api.js";  // ← import en haut
 
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css2?family=Righteous&family=DM+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap');
@@ -12,13 +13,11 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-/* ── animations ── */
 const fadeUp = keyframes`
   from { opacity: 0; transform: translateY(18px); }
   to   { opacity: 1; transform: translateY(0); }
 `;
 
-/* ── page shell ── */
 const StylePage = styled.div`
   background-color: #fff8f8;
   min-height: 100vh;
@@ -26,7 +25,6 @@ const StylePage = styled.div`
   padding-bottom: 60px;
 `;
 
-/* ── topbar ── */
 const HomeTopbar = styled.div`
   display: flex;
   align-items: center;
@@ -73,7 +71,6 @@ const DropItem = styled.div`
   &:hover { background: ${p => p.$label ? "transparent" : "#fff8f8"}; }
 `;
 
-/* ── hero header ── */
 const Hero = styled.div`
   text-align: center;
   padding: 8px 24px 28px;
@@ -87,21 +84,10 @@ const Titre = styled.h1`
   letter-spacing: 3px;
   line-height: 1;
   margin-bottom: 6px;
-  /* subtle 3d tilt kept from original, cleaned up */
   transform: perspective(400px) rotateX(-8deg);
   text-shadow: 0px 4px 0px rgba(0,0,0,0.08), 3px 8px 20px rgba(0,0,0,0.12);
 `;
 
-const TitreSub = styled.p`
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  color: #aaa;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-top: 10px;
-`;
-
-/* ── score block ── */
 const ScoreBlock = styled.div`
   margin: 0 24px 32px;
   background: #1A1A2E;
@@ -113,8 +99,6 @@ const ScoreBlock = styled.div`
   animation: ${fadeUp} 0.5s 0.1s ease both;
   box-shadow: 0 8px 28px rgba(26,26,46,0.18);
 `;
-
-const ScoreLeft = styled.div``;
 
 const ScoreLabel = styled.p`
   font-family: 'DM Sans', sans-serif;
@@ -138,15 +122,12 @@ const ScoreUnit = styled.span`
   margin-left: 4px;
 `;
 
-const ScoreRight = styled.div`
-  text-align: right;
-`;
-
 const ClassementBadge = styled.div`
   background: rgba(255,255,255,0.1);
   border: 1px solid rgba(255,255,255,0.15);
   border-radius: 12px;
   padding: 10px 18px;
+  text-align: right;
 `;
 
 const ClassementNum = styled.p`
@@ -163,7 +144,6 @@ const ClassementSub = styled.p`
   margin-top: 2px;
 `;
 
-/* ── section title ── */
 const SectionTitle = styled.p`
   font-family: 'DM Sans', sans-serif;
   font-size: 11px;
@@ -175,7 +155,6 @@ const SectionTitle = styled.p`
   margin-bottom: 10px;
 `;
 
-/* ── SOS cards grid ── */
 const CardsList = styled.div`
   padding: 0 12px;
   display: flex;
@@ -194,27 +173,12 @@ const SOSCardWrap = styled.div`
   cursor: pointer;
   transition: box-shadow 0.2s, transform 0.15s;
   animation: ${fadeUp} 0.4s ${p => p.$delay}s ease both;
-
-  &:hover {
-    box-shadow: 0 6px 20px rgba(0,0,0,0.10);
-    transform: translateY(-2px);
-  }
-
+  &:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.10); transform: translateY(-2px); }
   @media (max-width: 400px) { width: 100%; }
 `;
 
-const CardNom = styled.p`
-  font-family: 'Righteous', cursive;
-  font-size: 14px;
-  color: #1A1A2E;
-  line-height: 1.2;
-`;
-
-const CardMeta = styled.p`
-  font-family: 'DM Sans', sans-serif;
-  font-size: 11px;
-  color: rgba(0,0,0,0.45);
-`;
+const CardNom  = styled.p`font-family:'Righteous',cursive;font-size:14px;color:#1A1A2E;line-height:1.2;`;
+const CardMeta = styled.p`font-family:'DM Sans',sans-serif;font-size:11px;color:rgba(0,0,0,0.45);`;
 
 const ValiderBtn = styled.button`
   margin-top: 10px;
@@ -232,28 +196,39 @@ const ValiderBtn = styled.button`
   &:hover { background: #f0f0f0; transform: scale(1.03); }
 `;
 
-/* ── data ── */
-const MOCK_SOS = [
-  { id: 1, nom: "Limbo Challenge",  heure: "18h00", destinataire: "Alex Blanc",  turne: "T-099", color: "grey"   },
-  { id: 2, nom: "Selfie Fontaine",  heure: "12h00", destinataire: "Nina Moreau", turne: "T-143", color: "yellow" },
-  { id: 3, nom: "Battle Dance",     heure: "20h00", destinataire: "Romain F.",   turne: "T-211", color: "grey"   },
-  { id: 4, nom: "Pub Crawl Photo",  heure: "21h30", destinataire: "Chloé A.",    turne: "T-077", color: "yellow" },
-  { id: 5, nom: "Vélo Tour",        heure: "10h30", destinataire: "Yann Gérard", turne: "T-255", color: "grey"   },
-  { id: 6, nom: "Karaoké Express",  heure: "22h00", destinataire: "Léa Martin",  turne: "T-302", color: "yellow" },
-  { id: 7, nom: "Yoga Surprise",    heure: "09h00", destinataire: "Tom Duval",   turne: "T-188", color: "grey"   },
-];
+const Skeleton = styled.div`
+  background: #e5e0da;
+  border-radius: 20px;
+  width: calc(50% - 5px);
+  height: 140px;
+  animation: pulse 1.4s ease-in-out infinite;
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+`;
 
+/* ── Composant ── */
 export default function PageAccueil() {
-  const [open, setOpen] = useState(false);
+  const [open,    setOpen]    = useState(false);
+  const [sos,     setSos]     = useState([]);
+  const [score,   setScore]   = useState({ points: 0, nom: "" });
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const isYellow = sos => sos.color === "yellow";
+
+  // ← useEffect DANS le composant
+  useEffect(() => {
+    Promise.all([fetchSosEnAttente(), fetchScore()])
+      .then(([sosData, scoreData]) => {
+        setSos(sosData);
+        setScore(scoreData);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <>
       <GlobalStyle />
       <StylePage>
 
-        {/* Topbar avatar */}
         <HomeTopbar>
           <div style={{ position: "relative" }}>
             <AvatarBtn onClick={() => setOpen(v => !v)}>
@@ -271,43 +246,37 @@ export default function PageAccueil() {
           </div>
         </HomeTopbar>
 
-        {/* Hero */}
         <Hero>
           <Titre>MES SOS</Titre>
         </Hero>
 
-        {/* Score block */}
         <ScoreBlock>
-          <ScoreLeft>
+          <div>
             <ScoreLabel>Score total</ScoreLabel>
-            <ScoreValue>240<ScoreUnit>pts</ScoreUnit></ScoreValue>
-          </ScoreLeft>
-          <ScoreRight>
-            <ClassementBadge>
-              <ClassementNum>4ème</ClassementNum>
-              <ClassementSub>sur 8 listes</ClassementSub>
-            </ClassementBadge>
-          </ScoreRight>
+            <ScoreValue>{score.points}<ScoreUnit>pts</ScoreUnit></ScoreValue>
+          </div>
+          <ClassementBadge>
+            <ClassementNum>—</ClassementNum>
+            <ClassementSub>Classement</ClassementSub>
+          </ClassementBadge>
         </ScoreBlock>
 
-        {/* SOS list */}
-        <SectionTitle>SOS en attente · {MOCK_SOS.length}</SectionTitle>
+        <SectionTitle>SOS en attente · {loading ? "…" : sos.length}</SectionTitle>
         <CardsList>
-          {MOCK_SOS.map((sos, i) => (
-            <SOSCardWrap
-              key={sos.id}
-              $yellow={isYellow(sos)}
-              $delay={0.15 + i * 0.05}
-            >
-              <CardNom>{sos.nom}</CardNom>
-              <CardMeta>{sos.heure}</CardMeta>
-              <CardMeta>{sos.destinataire}</CardMeta>
-              <CardMeta>{sos.turne}</CardMeta>
-              <ValiderBtn onClick={() => navigate(`/valider/${sos.id}`)}>
-                Valider le SOS
-              </ValiderBtn>
-            </SOSCardWrap>
-          ))}
+          {loading
+            ? [0,1,2,3].map(i => <Skeleton key={i} />)
+            : sos.map((s, i) => (
+              <SOSCardWrap key={s._id} $yellow={i % 2 !== 0} $delay={0.15 + i * 0.05}>
+                <CardNom>{s.nom_SOS}</CardNom>
+                <CardMeta>{s.horaire_jour}</CardMeta>
+                <CardMeta>{s.nom_pote}</CardMeta>
+                <CardMeta>{s.key}</CardMeta>
+                <ValiderBtn onClick={() => navigate(`/valider/${s.key}`)}>
+                  Valider le SOS
+                </ValiderBtn>
+              </SOSCardWrap>
+            ))
+          }
         </CardsList>
 
       </StylePage>

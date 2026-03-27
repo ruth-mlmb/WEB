@@ -1,25 +1,34 @@
+import { useState, useEffect } from "react";
 import Topbar from "./Topbar";
+import { fetchSosExpires } from "./api.js";
 import "./index.css";
 
-const MOCK_EXPIRES = [
-  { id: 1, nom: "Tournoi Ping Pong", turne: "T-077", cible: "Chloé André",   date: "10 Mar — 14h00", raison: "Délai dépassé" },
-  { id: 2, nom: "Battle Dance",      turne: "T-211", cible: "Romain Fleury", date: "08 Mar — 19h00", raison: "Non réalisé"   },
-];
-
 export default function SosExpires() {
+  const [sos,     setSos]     = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchSosExpires()
+      .then(setSos)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <div style={{ background: "#FDF6F0", minHeight: "100vh" }}>
       <Topbar title="SOS EXPIRÉS" />
       <div className="page">
-        <p className="page-subtitle">{MOCK_EXPIRES.length} SOS expirés</p>
+        <p className="page-subtitle">
+          {loading ? "Chargement…" : `${sos.length} SOS expirés`}
+        </p>
 
-        {MOCK_EXPIRES.map(s => (
-          <div key={s.id} className="sos-card expired">
+        {sos.map(s => (
+          <div key={s._id} className="sos-card expired">
             <div>
-              <div className="card-title">{s.nom}</div>
-              <div className="card-meta">{s.turne} • {s.cible} • {s.date}</div>
+              <div className="card-title">{s.nom_SOS}</div>
+              <div className="card-meta">{s.key} • {s.nom_pote} • {s.horaire_jour}</div>
             </div>
-            <span className="badge danger">{s.raison}</span>
+            <span className="badge danger">Expiré</span>
           </div>
         ))}
       </div>
