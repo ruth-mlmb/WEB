@@ -2,43 +2,30 @@ import mongoose from 'mongoose';
 
 const sosSchema = new mongoose.Schema(
   {
-    id: {
+    serviceId: {
       type: Number,
       required: true,
-      description: 'ID du service (1-12/13 selon la liste)',
+      description: 'ID du service SOS',
     },
-    title: {
+    name: {
       type: String,
       required: true,
       description: 'Nom du service SOS',
     },
-    description: {
+    Description: {
       type: String,
       required: true,
       description: 'Description du service',
     },
-    icon: {
-      type: String,
-      description: 'Emoji ou icône du service',
-    },
-    number: {
-      type: String,
-      description: 'Numéro à appeler',
-    },
-    color: {
-      type: String,
-      description: 'Couleur hexadécimale associée',
-    },
     image: {
       type: String,
       default: null,
-      description: 'URL ou path de l\'image (null au début)',
+      description: 'URL ou path de l\'image',
     },
-    listeId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Listes',
+    liste: {
+      type: String,
       required: true,
-      description: 'Référence à la liste CDP',
+      description: 'Nom de la liste CDP (ex: INSAPOCALYPSE)',
     },
   },
   { timestamps: true }

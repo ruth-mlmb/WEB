@@ -16,27 +16,18 @@ router.get('/listes', async (req, res) => {
   }
 });
 
-// ✅ GET - Récupérer tous les services pour une liste (query listeId numérique ou ObjectId)
+// ✅ GET - Récupérer tous les services pour une liste
 router.get('/services', async (req, res) => {
-  const { listeId } = req.query;
-  if (!listeId) {
-    return res.status(400).json({ error: 'listeId requis' });
+  const { listeName } = req.query;
+  if (!listeName) {
+    return res.status(400).json({ error: 'listeName requis' });
   }
 
   try {
-    let liste = null;
-    if (/^[0-9]+$/.test(listeId)) {
-      liste = await Listes.findOne({ id: parseInt(listeId, 10) });
-    }
-    if (!liste) {
-      liste = await Listes.findById(listeId);
-    }
-
-    if (!liste) {
-      return res.status(404).json({ error: 'Liste introuvable' });
-    }
-
-    const services = await SOS.find({ listeId: liste._id }).sort({ id: 1 });
+    // Chercher par liste avec recherche insensible à la casse
+    const services = await SOS.find({ 
+      liste: { $regex: listeName, $options: 'i' }
+    }).sort({ serviceId: 1 });
     res.json(services);
   } catch (error) {
     console.error('Erreur récupération services:', error);
@@ -47,31 +38,36 @@ router.get('/services', async (req, res) => {
 // ✅ POST - Créer un nouveau SOS commandé
 router.post('/commande', async (req, res) => {
   try {
-    const { serviceId, listeId, nomPote, numeroBat, numeroChambre, horaire, jour } = req.body;
+    const { serviceId, listeName, nomPote, numeroBat, numeroChambre, horaire, jour } = req.body;
 
     // LOG: Voir ce qui est reçu
-    console.log('📨 Données reçues:', { serviceId, listeId, nomPote, numeroBat, numeroChambre, horaire, jour });
+    console.log('📨 Données reçues:', { serviceId, listeName, nomPote, numeroBat, numeroChambre, horaire, jour });
 
     // Validation des données
-    if (!serviceId || !listeId || !nomPote || !numeroBat || !numeroChambre || !horaire || !jour) {
+    if (!serviceId || !listeName || !nomPote || !numeroBat || !numeroChambre || !horaire || !jour) {
       console.log('❌ Validation échouée: champs manquants');
       return res.status(400).json({ error: 'Tous les champs sont requis' });
     }
 
-    // Vérifier que la liste existe
-    const liste = await Listes.findOne({ id: parseInt(listeId) });
+    // Vérifier que la liste existe (chercher par name ou Nom)
+    const liste = await Listes.findOne({ 
+      $or: [
+        { name: listeName },
+        { Nom: listeName }
+      ]
+    });
     if (!liste) {
-      console.log('❌ Liste invalide:', listeId);
+      console.log('❌ Liste invalide:', listeName);
       return res.status(400).json({ error: 'Liste invalide' });
     }
 
     // Vérifier que le service existe et appartient à la liste
     const sos = await SOS.findOne({ 
-      id: parseInt(serviceId), 
-      listeId: liste._id 
+      serviceId: parseInt(serviceId), 
+      liste: { $regex: listeName, $options: 'i' }
     });
     if (!sos) {
-      console.log('❌ Service invalide:', serviceId, 'pour la liste:', listeId);
+      console.log('❌ Service invalide:', serviceId, 'pour la liste:', listeName);
       return res.status(400).json({ error: 'Service invalide' });
     }
 

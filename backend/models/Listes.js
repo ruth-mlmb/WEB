@@ -10,8 +10,11 @@ const listesSchema = new mongoose.Schema(
     },
     name: {
       type: String,
-      required: true,
-      description: 'Nom de la liste CDP',
+      description: 'Nom de la liste CDP (nouveau champ)',
+    },
+    Nom: {
+      type: String,
+      description: 'Nom de la liste CDP (ancien champ)',
     },
     image: {
       type: String,
