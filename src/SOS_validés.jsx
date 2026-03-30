@@ -7,14 +7,17 @@ export default function SosValides() {
   const [sos,     setSos]     = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const listeId = Number(localStorage.getItem('cdp_listeId') || 1);
+
   useEffect(() => {
-    fetchSosValides()
+    fetchSosValides(listeId)
       .then(setSos)
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [listeId]);
 
-  const total = sos.reduce((acc, s) => acc + (s.points ?? 0), 0);
+  // Chaque SOS validé rapporte 10 points (logique backend)
+  const total = sos.length * 10;
 
   return (
     <div style={{ background: "#FDF6F0", minHeight: "100vh" }}>
@@ -28,10 +31,10 @@ export default function SosValides() {
         {sos.map(s => (
           <div key={s._id} className="sos-card">
             <div>
-              <div className="card-title">{s.nom_SOS}</div>
-              <div className="card-meta">{s.key} • {s.nom_pote} • {s.horaire_jour}</div>
+              <div className="card-title">{s.nom_SOS || s.description}</div>
+              <div className="card-meta">{s.nomPote || s.nom_pote || s.pnom_commande} • {s.jour || ''} {s.horaire || ''}</div>
             </div>
-            <span className="badge success">+{s.points ?? 0} pts</span>
+            <span className="badge success">+10 pts</span>
           </div>
         ))}
       </div>
