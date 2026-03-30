@@ -1,14 +1,23 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Topbar from "./Topbar";
 import "./index.css";
 
-import { validerSos } from "./api.js";
+import { fetchSosById, validerSos } from "./api.js";
 
 export default function ValiderSOS() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const sos = MOCK_SOS.find(s => String(s.id) === String(id));
+  const [sos, setSos] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!id) return;
+    fetchSosById(id)
+      .then(data => setSos(data))
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [id]);
 
   const [cdpNom, setCdpNom]   = useState("");
   const [photo, setPhoto]     = useState(null);
@@ -27,8 +36,11 @@ export default function ValiderSOS() {
     if (!cdpNom.trim() || !photo || !sos) return;
     try {
       setSubmitted(true);
-      await validerSos(sos.key || sos.id, cdpNom, photo);
-      setTimeout(() => navigate("/valides"), 2000);
+      await validerSos(sos._id, cdpNom, photo);
+      setTimeout(() => {
+        navigate("/valides");
+        setTimeout(() => window.location.reload(), 300); // Force le rafraîchissement pour mettre à jour le score
+      }, 2000);
     } catch (error) {
       console.error("Erreur lors de la validation:", error);
       setSubmitted(false);
@@ -41,7 +53,13 @@ export default function ValiderSOS() {
       <Topbar title="VALIDE TON SOS" />
 
       <div className="page">
-        {submitted ? (
+        {loading ? (
+          <div className="valider-success-wrap">
+            <div className="valider-success">
+              <p>Chargement du SOS...</p>
+            </div>
+          </div>
+        ) : submitted ? (
           <div className="valider-success-wrap">
             <div className="valider-success">
               <svg width="72" height="72" viewBox="0 0 52 52" fill="none">
@@ -56,10 +74,10 @@ export default function ValiderSOS() {
           <div className="valider-card">
             <div className="valider-banner" />
             <div className="valider-body">
-              <h2 className="valider-sos-name">{sos?.nom ?? "Nom du SOS"}</h2>
+              <h2 className="valider-sos-name">{sos?.nom_SOS || sos?.description || "Nom du SOS"}</h2>
               {sos && (
                 <p className="valider-sos-meta">
-                  {sos.turne} • {sos.destinataire} • {sos.heure}
+                  {sos.jour || ''} • {sos.horaire || ''} • {sos.nomPote || sos.nom_pote || sos.pnom_commande || ''}
                 </p>
               )}
 
