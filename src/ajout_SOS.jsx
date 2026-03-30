@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Topbar from "./Topbar";
 import "./index.css";
+import { commanderSos } from "./api.js";
 
 const MOCK_SOS = [
   { id: 1, nom: "Limbo Challenge",  heure: "18h00", destinataire: "Alex Blanc",  turne: "T-099" },
@@ -32,10 +33,34 @@ export default function AjoutSos() {
     setPreview(URL.createObjectURL(file));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!sosNom.trim() || !photo) return;
-    setSubmitted(true);
-    setTimeout(() => navigate("/valides"), 2000);
+
+    try {
+      setSubmitted(true);
+      const listeId = Number(localStorage.getItem('cdp_listeId') || 1);
+      const listeName = localStorage.getItem('cdp_listeName') || 'Liste inconnue';
+
+      await commanderSos({
+        listeId,
+        listeName,
+        nomPote: sosNom,
+        nom_SOS: sosNom,
+        description: sosDesc,
+        image: photo,
+        batiment: 'Inconnu',
+        chambre: 'Inconnue',
+        jour: 'Lundi',
+        horaire: 'Matin',
+        key: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      });
+
+      setTimeout(() => navigate("/valides"), 2000);
+    } catch (error) {
+      console.error('Erreur commande SOS:', error);
+      setSubmitted(false);
+      alert('Erreur lors de la commande du SOS');
+    }
   };
 
   return (
