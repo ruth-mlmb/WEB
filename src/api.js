@@ -2,7 +2,8 @@
 // Toutes les fonctions qui parlent à votre backend.
 // Adaptées à votre server.js (port 5000, route /api/cdp)
 
-const BASE = "http://localhost:5000/api";
+const BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+console.log('API BASE URL:', BASE);
 
 const authHeaders = () => ({
   Authorization: `Bearer ${localStorage.getItem("cdp_token")}`,
@@ -36,27 +37,61 @@ export function logout() {
 
 /* ── SOS ──────────────────────────────────────────────── */
 
-export const fetchSosEnAttente = () =>
-  fetch(`${BASE}/cdp/sos-en-attente`, { headers: authHeaders() }).then(handle);
+export const fetchSosEnAttente = (listeId) => {
+  const query = listeId ? `?listeId=${encodeURIComponent(listeId)}` : '';
+  return fetch(`${BASE}/cdp/sos-en-attente${query}`, { headers: authHeaders() }).then(handle);
+};
 
-export const fetchSosValides = () =>
-  fetch(`${BASE}/cdp/sos-valides`, { headers: authHeaders() }).then(handle);
+export const fetchSosValides = (listeId) => {
+  const query = listeId ? `?listeId=${encodeURIComponent(listeId)}` : '';
+  return fetch(`${BASE}/cdp/sos-valides${query}`, { headers: authHeaders() }).then(handle);
+};
 
-export const fetchSosExpires = () =>
-  fetch(`${BASE}/cdp/sos-expires`, { headers: authHeaders() }).then(handle);
+export const fetchSosExpires = (listeId) => {
+  const query = listeId ? `?listeId=${encodeURIComponent(listeId)}` : '';
+  return fetch(`${BASE}/cdp/sos-expires${query}`, { headers: authHeaders() }).then(handle);
+};
 
-export const fetchScore = () =>
-  fetch(`${BASE}/cdp/score`, { headers: authHeaders() }).then(handle);
+export const fetchScore = (listeId, listeName) => {
+  const params = new URLSearchParams();
+  if (listeId) params.set('listeId', listeId);
+  if (listeName) params.set('listeName', listeName);
+  const query = params.toString() ? `?${params.toString()}` : '';
+  return fetch(`${BASE}/cdp/score${query}`, { headers: authHeaders() }).then(handle);
+};
+
+export const fetchSosById = (id) =>
+  fetch(`${BASE}/cdp/sos/${id}`, { headers: authHeaders() }).then(handle);
 
 // Envoie la photo de validation (multipart/form-data)
-export async function validerSos(key, cdpNom, photoFile) {
+export async function validerSos(id, cdpNom, photoFile) {
   const form = new FormData();
-  form.append("cdpNom", cdpNom);
-  form.append("photo",  photoFile);
+  form.append('cdpNom', cdpNom);
+  form.append('photo', photoFile);
 
-  return fetch(`${BASE}/cdp/valider/${key}`, {
-    method: "POST",
-    headers: authHeaders(), // pas de Content-Type manuel, le browser pose le boundary
+  // N'ajoute PAS Content-Type, seulement Authorization
+  const headers = {};
+  const auth = authHeaders();
+  if (auth && auth.Authorization) headers['Authorization'] = auth.Authorization;
+
+  return fetch(`${BASE}/cdp/valider/${id}`, {
+    method: 'POST',
+    headers,
+    body: form,
+  }).then(handle);
+}
+
+export async function commanderSos(payload) {
+  const form = new FormData();
+
+  Object.entries(payload).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      form.append(key, value);
+    }
+  });
+
+  return fetch(`${BASE}/cdp/sos`, {
+    method: 'POST',
     body: form,
   }).then(handle);
 }
