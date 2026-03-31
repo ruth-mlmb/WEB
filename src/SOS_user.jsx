@@ -284,8 +284,8 @@ function SOS_user() {
             .map((sos) => {
             const isConfirmed = sos.etat === 1; // 1 = confirmée
             const serviceTitle = sos.sosId?.name || 'Service inconnu';
-            const serviceImage = sos.sosId?.image;
-            const imageSrc = isConfirmed && serviceImage ? serviceImage : (isConfirmed && !serviceImage ? null : waitImg);
+            const listImage = sos.listeId?.image;
+            const imageSrc = listImage ? listImage : null;
             return (
               <div key={sos._id || sos.id} className="my-sos-card" onClick={() => { setSelectedSOS(sos); setActivePage('recap'); }}>
                 <div className="my-sos-image-wrapper">
