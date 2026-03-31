@@ -4,6 +4,7 @@ import SosValides  from "./SOS_validés";
 import SosExpires  from "./SOS_expirés";
 import ValiderSOS  from "./ValiderSOS";
 import AjoutSos from "./ajout_SOS";
+import SOS_user from "./SOS_user";
 import Accueil from "./Fct_Accueil";
 import { Profil, Liste, BDE, LoginUser, LoginCDP, LoginBDE } from "./Fct_login";
 
@@ -20,6 +21,7 @@ export default function App() {
 
         <Route path="/login_user" element={<LoginUser />} />
         <Route path="/login_user/profil" element={<Profil />} />
+        <Route path="/login_user/mes-sos" element={<SOS_user />} />
 
         <Route path="/login_cdp" element={<LoginCDP />} />
         <Route path="/login_cdp/liste" element={<Liste />} />

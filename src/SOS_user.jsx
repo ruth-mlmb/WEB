@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import './SOS_user.css';
-import popBallonImg from './assets/pop_ballon.jpg';
-import waitImg from './assets/wait.jpg';
+// import waitImg from './assets/wait.jpg';
 import cdp1 from './assets/cdp1.jpeg';
-import cdp2 from './assets/cdp.2.jpeg';
+import cdp2 from './assets/cdp2.jpeg';
 import cdp3 from './assets/cdp3.jpeg';
 import cdp4 from './assets/cdp4.jpeg';
 import cdp5 from './assets/cdp5.jpeg';
@@ -127,6 +126,7 @@ function SOS_user() {
   const [searchTerm, setSearchTerm] = useState('');
   const [listCategoriesState, setListCategoriesState] = useState(listCategories);
   const [services, setServices] = useState([]);
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -381,7 +381,7 @@ function SOS_user() {
             const isConfirmed = sos.etat === 1; // 1 = confirmée
             const serviceTitle = sos.sosId?.name || 'Service inconnu';
             const serviceImage = sos.sosId?.image;
-            const imageSrc = isConfirmed && serviceImage ? serviceImage : (isConfirmed && !serviceImage ? null : waitImg);
+            const imageSrc = isConfirmed && serviceImage ? serviceImage : null;
             return (
               <div key={sos._id || sos.id} className="my-sos-card" onClick={() => { setSelectedSOS(sos); setActivePage('recap'); }}>
                 <div className="my-sos-image-wrapper">
@@ -423,7 +423,7 @@ function SOS_user() {
 
   if (activePage === 'recap' && selectedSOS) {
     const isConfirmed = selectedSOS.etat === 1; // 1 = confirmée
-    const imageSrc = isConfirmed ? (selectedSOS.image || '') : waitImg;
+    const imageSrc = isConfirmed ? (selectedSOS.image || '') : null;
     return (
       <div className="sos-main-container">
         <div className="sos-header-nav">

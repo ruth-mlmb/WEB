@@ -3,9 +3,13 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 function Profil() {
     const location = useLocation();
+    const navigate = useNavigate();
     return (
         <div>
             <h1>{location.state?.login || 'Profil'}</h1>
+            <button onClick={() => navigate('/login_user/mes-sos')} style={{ padding: '10px 20px', marginTop: '10px', cursor: 'pointer', borderRadius: '8px', border: 'none', background: '#f5e8eb', fontSize: '1rem', fontWeight: 'bold' }}>
+                📦 Mes SOS
+            </button>
         </div>
     );
 }
@@ -42,6 +46,8 @@ function LoginUser() {
         })
             .then((res) => res.json())
             .then((data) => {
+                // Stocker le userId pour les SOS
+                localStorage.setItem('userId', login);
                 navigate('/login_user/profil', { state: { login: data.pnom } });
             })
             .catch((err) => console.error(err));
