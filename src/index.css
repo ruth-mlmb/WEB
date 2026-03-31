@@ -277,3 +277,97 @@ body {
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* ── Login page ─────────────────────────────── */
+.login {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5f3f0 0%, #f9f7f5 100%);
+  padding: 2rem 1rem;
+}
+
+.titre-login {
+  font-family: 'Righteous', cursive;
+  font-size: 2.5rem;
+  color: #1A1A2E;
+  margin-bottom: 2.5rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.login form {
+  background: white;
+  border-radius: 35px;
+  padding: 3rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
+}
+
+.login label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #2C2C2C;
+}
+
+.login input {
+  padding: 1rem 1.2rem;
+  border: 2px solid #e8e4e0;
+  border-radius: 20px;
+  font-size: 1rem;
+  font-family: 'DM Sans', sans-serif;
+  background: #fafafa;
+  color: #2C2C2C;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.login input:focus {
+  border-color: #1A1A2E;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(26, 26, 46, 0.1);
+}
+
+.login button {
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #e8e4e0 0%, #f5e8eb 100%);
+  color: #1A1A2E;
+  border: 2px solid #e8e4e0;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 1rem;
+  font-family: 'Righteous', cursive;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 0.5rem;
+}
+
+.login button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(232, 228, 224, 0.4);
+  background: linear-gradient(135deg, #dfd8d0 0%, #eddfea 100%);
+  border-color: #d9d2ca;
+}
+
+.login button:active {
+  transform: translateY(0);
+}
+
+.login p {
+  color: #e53935;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  text-align: center;
+}

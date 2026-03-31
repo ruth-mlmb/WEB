@@ -56,7 +56,7 @@ export default function Accueil() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #0d0d0f; color: #e8e0d4; font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+        body { background: #f5f3f0; color: #e8e0d4; font-family: 'DM Sans', sans-serif; min-height: 100vh; }
 
         nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: linear-gradient(to bottom, #0d0d0fdd, transparent); backdrop-filter: blur(4px); }
         .nav-btn { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 0.15em; padding: 0.55rem 1.6rem; border-radius: 4px; border: none; cursor: pointer; transition: transform 0.15s, opacity 0.15s; text-decoration: none; display: inline-block; }
@@ -79,7 +79,7 @@ export default function Accueil() {
         @keyframes fadeIn { to { opacity: 1; } }
 
         .avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--medal-color); color: #0d0d0f; font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px var(--shadow); }
-        .cand-name { font-size: 0.78rem; font-weight: 500; color: #e8e0d4; text-align: center; max-width: 110px; }
+        .cand-name { font-size: 0.78rem; font-weight: 500; color: #1A1A2E; text-align: center; max-width: 110px; }
         .cand-score { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; color: var(--medal-color); }
 
         .stage { width: 120px; background: linear-gradient(to top, #1a1a20, #24242d); border-top: 3px solid var(--medal-color); box-shadow: 0 -4px 24px var(--shadow), inset 0 1px 0 var(--medal-color); display: flex; align-items: flex-start; justify-content: center; padding-top: 0.6rem; border-radius: 4px 4px 0 0; }
@@ -104,11 +104,11 @@ export default function Accueil() {
             if (localStorage.getItem('cdp_listeId')) {
               window.location.href = '/home';
             } else {
-              window.location.href = '/login_cdp';
+              window.location.href = '/login_user';
             }
           }}
         >
-          MES SOS
+          USER
         </button>
 
         {!localStorage.getItem('cdp_listeId') && (
