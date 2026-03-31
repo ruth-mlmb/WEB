@@ -87,6 +87,9 @@ router.post('/commande', async (req, res) => {
       data: newSOSCommande,
     });
   } catch (error) {
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ error: error.message });
+    }
     console.error('[sosRoutes] create commande error:', error.message);
     res.status(500).json({ error: 'Erreur serveur', details: error.message });
   }

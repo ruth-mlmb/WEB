@@ -1,104 +1,6 @@
 import { useState, useEffect } from 'react';
 import './SOS_user.css';
-// import waitImg from './assets/wait.jpg';
-import cdp1 from './assets/cdp1.jpeg';
-import cdp2 from './assets/cdp2.jpeg';
-import cdp3 from './assets/cdp3.jpeg';
-import cdp4 from './assets/cdp4.jpeg';
-import cdp5 from './assets/cdp5.jpeg';
-
-// Catégories de listes
-const listCategories = [
-  { id: 1, name: 'INSApocalypse', image: cdp1 },
-  { id: 2, name: 'INSAmerica', image: cdp2 },
-  { id: 3, name: 'INSAlorsLaZone', image: cdp3 },
-  { id: 4, name:'INSAladdin', image: cdp4 },
-  { id: 5, name: 'CDPunch', image: cdp5 },
-];
-
-// Listes de SOS pour chaque catégorie
-const sosPerCategory = {
-  1: [ // INSApocalypse
-    { id: 1, icon: '🎪', title: 'Minute de silence', color: '#FF6B6B', description: 'Spectacle chaotique', number: '15' },
-    { id: 2, icon: '🚀', title: 'Ration de survie', color: '#FF4444', description: 'Évacuation urgente', number: '18' },
-    { id: 3, icon: '🛡️', title: 'Arrestation du patient 0', color: '#4169E1', description: 'Refuge protégé', number: '17' },
-    { id: 4, icon: '💣', title: 'Réveil en beauté', color: '#1E90FF', description: 'Enlèvement dangers', number: '17' },
-    { id: 5, icon: '🔥', title: 'Discours fin du monde', color: '#9B59B6', description: 'Cas critiques', number: '112' },
-    { id: 6, icon: '❄️', title: 'Quarantaine', color: '#E74C3C', description: 'Zone cool', number: '112' },
-    { id: 7, icon: '⚡', title: 'Alerte fin du monde', color: '#F39C12', description: 'Réparation rapide', number: '112' },
-    { id: 8, icon: '🌪️', title: 'Tempête Contrôle', color: '#F1C40F', description: 'Stabilisation', number: '112' },
-    { id: 9, icon: '🧬', title: 'Opération zone toxique', color: '#34495E', description: 'Aide technologique', number: '112' },
-    { id: 10, icon: '🤖', title: 'Réveil musclé', color: '#16A085', description: 'Assistance mécanique', number: '3114' },
-    { id: 11, icon: '💥', title: 'Leçon de tir', color: '#7F8C8D', description: 'Gestion crises', number: '0800555555' },
-    { id: 12, icon: '🎬', title: 'Réalisateur SOS', color: '#C0392B', description: 'Production urgente', number: '112' },
-  ],
-  2: [ // INSAmerica
-    { id: 1, icon: '🤠', title: 'Cowboy Rescue', color: '#FF6B6B', description: 'Western urgence', number: '15' },
-    { id: 2, icon: '🦅', title: 'Eagle Air Force', color: '#FF4444', description: 'Intervention aérienne', number: '18' },
-    { id: 3, icon: '🏈', title: 'Super Bowl SOS', color: '#4169E1', description: 'Match urgence', number: '17' },
-    { id: 4, icon: '🗽', title: 'Statue Liberté', color: '#1E90FF', description: 'Assistance NYC', number: '17' },
-    { id: 5, icon: '🍔', title: 'Fast Food Doctor', color: '#9B59B6', description: 'Nutrition rush', number: '112' },
-    { id: 6, icon: '🚙', title: 'Pickup Truck', color: '#E74C3C', description: 'Transport rapide', number: '112' },
-    { id: 7, icon: '🎸', title: 'Rock Band SOS', color: '#F39C12', description: 'Orchestre urgence', number: '112' },
-    { id: 8, icon: '⛺', title: 'Camping Shelter', color: '#F1C40F', description: 'Bivouac secours', number: '112' },
-    { id: 9, icon: '🌭', title: 'BBQ Master', color: '#34495E', description: 'Cuisine urgence', number: '112' },
-    { id: 10, icon: '🎡', title: 'Parc Aventure', color: '#16A085', description: 'Attraction SOS', number: '3114' },
-    { id: 11, icon: '💰', title: 'Money Maker', color: '#7F8C8D', description: 'Conseil financier', number: '0800555555' },
-  ],
-  3: [ // INSAlorsLaZone
-    { id: 1, icon: '🏜️', title: 'Désert SOS', color: '#FF6B6B', description: 'Survie zone aride', number: '15' },
-    { id: 2, icon: '🐪', title: 'Caravane Express', color: '#FF4444', description: 'Transport dunes', number: '18' },
-    { id: 3, icon: '⛵', title: 'Bateau Zone', color: '#4169E1', description: 'Navigation urgence', number: '17' },
-    { id: 4, icon: '🏝️', title: 'Île Refuge', color: '#1E90FF', description: 'Abri paradis', number: '17' },
-    { id: 5, icon: '🔦', title: 'Lampe Torche SOS', color: '#9B59B6', description: 'Lumière urgence', number: '112' },
-    { id: 6, icon: '🧭', title: 'Navigateur Zone', color: '#E74C3C', description: 'Orientation GPS', number: '112' },
-    { id: 7, icon: '⛺', title: 'Tente Camping', color: '#F39C12', description: 'Abri mobile', number: '112' },
-    { id: 8, icon: '🌍', title: 'Explorateur SOS', color: '#F1C40F', description: 'Expédition urgence', number: '112' },
-    { id: 9, icon: '📡', title: 'Signal Relay', color: '#34495E', description: 'Communication zone', number: '112' },
-    { id: 10, icon: '🥾', title: 'Trek Randonnée', color: '#16A085', description: 'Marche urgence', number: '3114' },
-    { id: 11, icon: '🪨', title: 'Escalade Rescue', color: '#7F8C8D', description: 'Descente urgence', number: '0800555555' },
-  ],
-  4: [ // INSAladdin
-    { id: 1, icon: '🧞', title: 'Génie Magique', color: '#FF6B6B', description: '3 vœux urgents', number: '15' },
-    { id: 2, icon: '🐪', title: 'Tapis Volant SOS', color: '#FF4444', description: 'Transport aérien', number: '18' },
-    { id: 3, icon: '⚔️', title: 'Sabre Protecteur', color: '#4169E1', description: 'Protection royale', number: '17' },
-    { id: 4, icon: '🏰', title: 'Palais d\'Urgence', color: '#1E90FF', description: 'Refuge princier', number: '17' },
-    { id: 5, icon: '💎', title: 'Bijoux de Chance', color: '#9B59B6', description: 'Trésor sauveur', number: '112' },
-    { id: 6, icon: '🎭', title: 'Spectacle Magie', color: '#E74C3C', description: 'Illusion salvatrice', number: '112' },
-    { id: 7, icon: '🌹', title: 'Rose Éternelle', color: '#F39C12', description: 'Beauté curieuse', number: '112' },
-    { id: 8, icon: '👑', title: 'Couronne Royale', color: '#F1C40F', description: 'Pouvoir urgent', number: '112' },
-    { id: 9, icon: '🕌', title: 'Temple Caché', color: '#34495E', description: 'Sanctuaire secret', number: '112' },
-    { id: 10, icon: '🌙', title: 'Nuit Mystique', color: '#16A085', description: 'Magie nocturne', number: '3114' },
-    { id: 11, icon: '✨', title: 'Étincelles SOS', color: '#7F8C8D', description: 'Lumière magique', number: '0800555555' },
-  ],
-  5: [ // CDPunch
-    { id: 1, icon: '👊', title: 'Punch Ultime', color: '#FF6B6B', description: 'Combat SOS', number: '15' },
-    { id: 2, icon: '🥋', title: 'Maître Karaté', color: '#FF4444', description: 'Arts martiaux', number: '18' },
-    { id: 3, icon: '💪', title: 'Musclé Super', color: '#4169E1', description: 'Renfort physique', number: '17' },
-    { id: 4, icon: '🏆', title: 'Champion SOS', color: '#1E90FF', description: 'Victoire urgente', number: '17' },
-    { id: 5, icon: '⚽', title: 'Football Action', color: '#9B59B6', description: 'Match urgence', number: '112' },
-    { id: 6, icon: '🎖️', title: 'Médaille Honneur', color: '#E74C3C', description: 'Reconnaissance SOS', number: '112' },
-    { id: 7, icon: '🥊', title: 'Boxeur Pro', color: '#F39C12', description: 'Combat pro urgence', number: '112' },
-    { id: 8, icon: '🏅', title: 'Premier Podium', color: '#F1C40F', description: 'Victoire urgente', number: '112' },
-    { id: 9, icon: '⛹️', title: 'Basketteur SOS', color: '#34495E', description: 'Slam dunk urgence', number: '112' },
-    { id: 10, icon: '🎯', title: 'Tir Précis', color: '#16A085', description: 'Cible urgence', number: '3114' },
-    { id: 11, icon: '🚴', title: 'Cycliste Express', color: '#7F8C8D', description: 'Vitesse urgence', number: '0800555555' },
-  ],
-};
-
-// Fonction pour obtenir les services de la catégorie sélectionnée
-const getServicesForCategory = (categoryId) => {
-  return sosPerCategory[categoryId] || [];
-};
-
-// Fonction pour obtenir un service par son ID (cherche dans toutes les catégories)
-const getServiceById = (serviceId) => {
-  for (const categoryServices of Object.values(sosPerCategory)) {
-    const service = categoryServices.find(s => s.id === serviceId);
-    if (service) return service;
-  }
-  return null;
-};
+import waitImg from './assets/hero.png';
 
 const daysOfWeek = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 const times = ['Matin', 'Après-midi', 'Soir'];
@@ -124,9 +26,8 @@ function SOS_user() {
     jour: daysOfWeek[0],
   });
   const [searchTerm, setSearchTerm] = useState('');
-  const [listCategoriesState, setListCategoriesState] = useState(listCategories);
+  const [listCategoriesState, setListCategoriesState] = useState([]);
   const [services, setServices] = useState([]);
-
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -137,6 +38,13 @@ function SOS_user() {
     setFormData((prev) => ({ ...prev, horaire: time }));
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('userId');
+    setCurrentUser('utilisateur');
+    setShowProfileMenu(false);
+    window.location.href = '/';
+  };
+
   const fetchListes = async () => {
     try {
       console.log('🔄 Tentative de fetch des listes depuis DB...');
@@ -144,14 +52,11 @@ function SOS_user() {
       if (!response.ok) throw new Error('Impossible de charger les listes');
       const data = await response.json();
       console.log('✅ Listes reçues de DB:', data);
-      if (Array.isArray(data) && data.length > 0) {
-        setListCategoriesState(data);
-        console.log('📝 listCategoriesState mis à jour avec DB');
-      } else {
-        console.log('⚠️ Aucune liste en DB, utilisation fallback');
-      }
+      setListCategoriesState(Array.isArray(data) ? data : []);
+      console.log('📝 listCategoriesState mis à jour avec DB');
     } catch (err) {
-      console.warn('❌ Erreur fetchListes, utilisation fallback :', err);
+      console.warn('❌ Erreur fetchListes :', err);
+      setListCategoriesState([]);
     }
   };
 
@@ -178,12 +83,11 @@ function SOS_user() {
         }));
         setServices(mappedServices);
       } else {
-        console.log('⚠️ Aucun service en DB, utilisation fallback');
-        setServices(getServicesForCategory(liste.id));
+        setServices([]);
       }
     } catch (err) {
-      console.warn('❌ Erreur fetchServicesByListe, utilisation fallback :', err);
-      setServices(getServicesForCategory(liste.id));
+      console.warn('❌ Erreur fetchServicesByListe :', err);
+      setServices([]);
     }
   };
 
@@ -361,7 +265,7 @@ function SOS_user() {
                   <hr />
                   <div className="menu-item" onClick={() => { setActivePage('categories'); setShowProfileMenu(false); }}>Nouveau SOS</div>
                   <hr />
-                  <div className="menu-item logout">Déconnexion</div>
+                  <div className="menu-item logout" onClick={handleLogout}>Déconnexion</div>
                 </div>
               )}
             </div>
@@ -381,7 +285,7 @@ function SOS_user() {
             const isConfirmed = sos.etat === 1; // 1 = confirmée
             const serviceTitle = sos.sosId?.name || 'Service inconnu';
             const serviceImage = sos.sosId?.image;
-            const imageSrc = isConfirmed && serviceImage ? serviceImage : null;
+            const imageSrc = isConfirmed && serviceImage ? serviceImage : (isConfirmed && !serviceImage ? null : waitImg);
             return (
               <div key={sos._id || sos.id} className="my-sos-card" onClick={() => { setSelectedSOS(sos); setActivePage('recap'); }}>
                 <div className="my-sos-image-wrapper">
@@ -423,7 +327,7 @@ function SOS_user() {
 
   if (activePage === 'recap' && selectedSOS) {
     const isConfirmed = selectedSOS.etat === 1; // 1 = confirmée
-    const imageSrc = isConfirmed ? (selectedSOS.image || '') : null;
+    const imageSrc = isConfirmed ? (selectedSOS.image || '') : waitImg;
     return (
       <div className="sos-main-container">
         <div className="sos-header-nav">
@@ -493,7 +397,7 @@ function SOS_user() {
                   <hr />
                   <div className="menu-item" onClick={() => { setActivePage('mySOS'); setShowProfileMenu(false); }}>Mes SOS</div>
                   <hr />
-                  <div className="menu-item logout">Déconnexion</div>
+                  <div className="menu-item logout" onClick={handleLogout}>Déconnexion</div>
                 </div>
               )}
             </div>
@@ -546,7 +450,7 @@ function SOS_user() {
     };
     
     // Obtenir les services de la catégorie et filtrer/trier
-    const allServices = services.length > 0 ? services : getServicesForCategory(selectedList?.id || selectedList);
+    const allServices = services;
     const filteredServices = searchLower 
       ? allServices
           .map(service => ({ ...service, score: calculateScore(service) }))
@@ -598,7 +502,7 @@ function SOS_user() {
                   <hr />
                   <div className="menu-item" onClick={() => { setActivePage('mySOS'); setShowProfileMenu(false); }}>Mes SOS</div>
                   <hr />
-                  <div className="menu-item logout">Déconnexion</div>
+                  <div className="menu-item logout" onClick={handleLogout}>Déconnexion</div>
                 </div>
               )}
             </div>
@@ -668,7 +572,7 @@ function SOS_user() {
                   <hr />
                   <div className="menu-item" onClick={() => { setActivePage('mySOS'); setShowProfileMenu(false); }}>Mes SOS</div>
                   <hr />
-                  <div className="menu-item logout">Déconnexion</div>
+                  <div className="menu-item logout" onClick={handleLogout}>Déconnexion</div>
                 </div>
               )}
             </div>

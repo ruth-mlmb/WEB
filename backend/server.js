@@ -6,11 +6,11 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 import connectDB from './config/db.js';
 import cdpRoutes from './routes/cdpRoutes.js';
-import sosRoutes from './routes/sosSOS.js';
-
-dotenv.config();
+import sosRoutes from './routes/sosRoutes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.join(__dirname, '.env') });
+
 const uploadsPath = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsPath)) fs.mkdirSync(uploadsPath, { recursive: true });
 
