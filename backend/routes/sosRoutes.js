@@ -5,18 +5,18 @@ import Listes from '../models/Listes.js';
 
 const router = express.Router();
 
-// ✅ GET - Récupérer toutes les listes depuis la base de données
+// GET - Récupérer toutes les listes depuis la base de données
 router.get('/listes', async (req, res) => {
   try {
     const listes = await Listes.find().sort({ id: 1 });
     res.json(listes);
   } catch (error) {
-    console.error('Erreur récupération listes:', error);
+    console.error('[sosRoutes] fetch listes error:', error.message);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
 
-// ✅ GET - Récupérer tous les services pour une liste
+// GET - Récupérer tous les services pour une liste
 router.get('/services', async (req, res) => {
   const { listeName } = req.query;
   if (!listeName) {
@@ -30,22 +30,18 @@ router.get('/services', async (req, res) => {
     }).sort({ serviceId: 1 });
     res.json(services);
   } catch (error) {
-    console.error('Erreur récupération services:', error);
+    console.error('[sosRoutes] fetch services error:', error.message);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
 
-// ✅ POST - Créer un nouveau SOS commandé
+// POST - Créer un nouveau SOS commandé
 router.post('/commande', async (req, res) => {
   try {
     const { userId, serviceId, listeName, nomPote, numeroBat, numeroChambre, horaire, jour } = req.body;
 
-    // LOG: Voir ce qui est reçu
-    console.log('📨 Données reçues:', { userId, serviceId, listeName, nomPote, numeroBat, numeroChambre, horaire, jour });
-
     // Validation des données
     if (!userId || !serviceId || !listeName || !nomPote || !numeroBat || !numeroChambre || !horaire || !jour) {
-      console.log('❌ Validation échouée: champs manquants');
       return res.status(400).json({ error: 'Tous les champs sont requis' });
     }
 
@@ -57,7 +53,6 @@ router.post('/commande', async (req, res) => {
       ]
     });
     if (!liste) {
-      console.log('❌ Liste invalide:', listeName);
       return res.status(400).json({ error: 'Liste invalide' });
     }
 
@@ -67,7 +62,6 @@ router.post('/commande', async (req, res) => {
       liste: { $regex: listeName, $options: 'i' }
     });
     if (!sos) {
-      console.log('❌ Service invalide:', serviceId, 'pour la liste:', listeName);
       return res.status(400).json({ error: 'Service invalide' });
     }
 
@@ -83,24 +77,22 @@ router.post('/commande', async (req, res) => {
       jour,
     });
 
-    console.log('💾 Sauvegarde en base de données...');
     await newSOSCommande.save();
 
     // Populer les références pour la réponse
     await newSOSCommande.populate('listeId sosId');
 
-    console.log('✅ SOS commandé avec ID:', newSOSCommande._id);
     res.status(201).json({
-      message: '✅ SOS commandé avec succès!',
+      message: 'SOS commande avec succes.',
       data: newSOSCommande,
     });
   } catch (error) {
-    console.error('❌ Erreur lors de la commande SOS:', error);
+    console.error('[sosRoutes] create commande error:', error.message);
     res.status(500).json({ error: 'Erreur serveur', details: error.message });
   }
 });
 
-// ✅ GET - Récupérer tous les SOS commandés (ou filtrés par userId)
+// GET - Récupérer tous les SOS commandés (ou filtrés par userId)
 router.get('/tous', async (req, res) => {
   try {
     const { userId } = req.query;
@@ -114,12 +106,12 @@ router.get('/tous', async (req, res) => {
       .sort({ dateCommande: -1 });
     res.json(tous);
   } catch (error) {
-    console.error('Erreur lors de la récupération:', error);
+    console.error('[sosRoutes] fetch commandes error:', error.message);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
 
-// ✅ GET - SOS commandés par jour et horaire
+// GET - SOS commandés par jour et horaire
 router.get('/par-jour-horaire', async (req, res) => {
   try {
     const { jour, horaire } = req.query;
@@ -134,12 +126,12 @@ router.get('/par-jour-horaire', async (req, res) => {
       .sort({ dateCommande: -1 });
     res.json(sos);
   } catch (error) {
-    console.error('Erreur:', error);
+    console.error('[sosRoutes] fetch par-jour-horaire error:', error.message);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
 
-// ✅ GET - Détails d'un SOS commandé
+// GET - Détails d'un SOS commandé
 router.get('/:id', async (req, res) => {
   try {
     const sos = await SOSCommande.findById(req.params.id)
@@ -150,12 +142,12 @@ router.get('/:id', async (req, res) => {
     }
     res.json(sos);
   } catch (error) {
-    console.error('Erreur:', error);
+    console.error('[sosRoutes] fetch commande by id error:', error.message);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
 
-// ✅ PUT - Mettre à jour l'état du SOS commandé
+// PUT - Mettre à jour l'état du SOS commandé
 router.put('/:id/status', async (req, res) => {
   try {
     const { etat } = req.body;
@@ -166,12 +158,12 @@ router.put('/:id/status', async (req, res) => {
     ).populate('listeId').populate('sosId');
     res.json(sos);
   } catch (error) {
-    console.error('Erreur:', error);
+    console.error('[sosRoutes] update status error:', error.message);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
 
-// ✅ DELETE - Annuler (supprimer) un SOS commandé
+// DELETE - Annuler (supprimer) un SOS commandé
 router.delete('/:id', async (req, res) => {
   try {
     const sos = await SOSCommande.findById(req.params.id);
@@ -196,7 +188,7 @@ router.delete('/:id', async (req, res) => {
 
     res.json({ message: 'SOS annulé avec succès.' });
   } catch (error) {
-    console.error('Erreur:', error);
+    console.error('[sosRoutes] delete commande error:', error.message);
     res.status(500).json({ error: 'Erreur serveur', details: error.message });
   }
 });

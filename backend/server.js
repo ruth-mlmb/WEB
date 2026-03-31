@@ -21,11 +21,11 @@ app.use('/api/sos', sosRoutes);
 
 // Route test
 app.get('/api/health', (req, res) => {
-  res.json({ message: '✅ Serveur OK', timestamp: new Date() });
+  res.json({ message: 'Server OK', timestamp: new Date() });
 });
 
 // Démarrage du serveur
 app.listen(PORT, () => {
-  console.log(`🚀 Serveur lancé sur http://localhost:${PORT}`);
-  console.log(`📊 API SOS: http://localhost:${PORT}/api/sos`);
+  console.log(`[server] listening on http://localhost:${PORT}`);
+  console.log(`[server] api base http://localhost:${PORT}/api/sos`);
 });
