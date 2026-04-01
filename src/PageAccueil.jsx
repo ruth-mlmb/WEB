@@ -156,6 +156,7 @@ export default function PageAccueil() {
                 <CardNom>{s.nom_SOS || s.description || 'SOS sans titre'}</CardNom>
                 <CardMeta>{[s.jour, s.horaire].filter(Boolean).join(' • ')}</CardMeta>
                 <CardMeta>{s.nomPote || s.nom_pote || s.pnom_commande || ''}</CardMeta>
+                <CardMeta>{s.numeroBat && s.numeroChambre ? `Bâtiment ${s.numeroBat} • Chambre ${s.numeroChambre}`: ''}</CardMeta>
                 {s.imageUrl && (
                   <img src={s.imageUrl} alt="SOS" style={{ width:'100%', borderRadius:'10px', marginTop:4 }} />
                 )}
